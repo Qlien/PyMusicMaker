@@ -1,31 +1,30 @@
 import wx
 from toolbarHelper import *
+from windowsHelper import *
+from Frames.plugins_tree_frame import *
+from Frames.souds_frame import *
+from Frames.soundboard_frame import *
 
 
 class MDIFrame(wx.MDIParentFrame):
     def __init__(self):
-        wx.MDIParentFrame.__init__(self, None, -1, "PyMusicMaker", size=(1200, 800))
+        wx.MDIParentFrame.__init__(self, None, -1, "PyMusicMaker", size=(1400, 800))
         menu = wx.Menu()
-        menu.Append(5000, "&New Window")
         menu.Append(5001, "&Exit")
         menubar = wx.MenuBar()
         menubar.Append(menu, "&File")
 
         self.SetMenuBar(menubar)
-        self.Bind(wx.EVT_MENU, self.OnNewWindow, id=5000)
-        self.Bind(wx.EVT_MENU, self.OnExit, id=5001)
+        self.Bind(wx.EVT_MENU, self.on_exit, id=5001)
 
-        generate_play_menu_toolbar(self, self.OnExit, self.OnExit, self.OnExit, self.OnExit)
+        generate_play_menu_toolbar(self, self.on_exit, self.on_exit, self.on_exit, self.on_exit)
+        generate_plugins_frame(self)
+        generate_sounds_frame(self)
+        generate_soundboard_frame(self)
+        #generate_keyboard_window(self)
 
-    def OnExit(self, evt):
+    def on_exit(self, evt):
         self.Close(True)
-
-    def OnNewWindow(self, evt):
-        win = wx.MDIChildFrame(self, -1, "Child Window", style=wx.DEFAULT_FRAME_STYLE ^ wx.MINIMIZE_BOX ^ wx.MAXIMIZE_BOX)
-        win.Show(True)
-
-def scaleImage(imageDir, width, height, quality = wx.IMAGE_QUALITY_HIGH):
-    return wx.Bitmap(wx.Bitmap(imageDir).ConvertToImage().Scale(width, height, wx.IMAGE_QUALITY_HIGH))
 
 app = wx.App()
 frame = MDIFrame()
