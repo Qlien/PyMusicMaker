@@ -7,5 +7,3 @@ def generate_soundboard_frame(parent):
     s.Add(Canvas.Canvas(win), 1, wx.EXPAND)
     win.SetSizeHints(110,600, 1200, 1200)
     win.Show(True)
-
-    win = Canvas.Canvas(parent)
