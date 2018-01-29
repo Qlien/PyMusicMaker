@@ -26,7 +26,7 @@ class Canvas(wx.ScrolledWindow):
     def __init__(self, parent, id = -1, size = wx.DefaultSize, **kw):
         wx.ScrolledWindow.__init__(self, parent, id, (0, 0), size=size, style=wx.SUNKEN_BORDER)
 
-        self.scrollStep = kw.get("scrollStep", 10)
+        self.scrollStep = kw.get("scrollStep", 20)
         self._soundBoardBG = SoundBoardBG(parts=20)
         self.canvasDimensions = kw.get("canvasDimensions", [1 + self._soundBoardBG.xBegin +
                                                             (self._soundBoardBG.parts *
@@ -42,7 +42,7 @@ class Canvas(wx.ScrolledWindow):
                            self.scrollStep,
                            self.canvasDimensions[0] / self.scrollStep,
                            self.canvasDimensions[1] / self.scrollStep)
-        # self.SetBackgroundColour("WHITE")
+        self.SetBackgroundColour("WHITE")
 
         # This list stores all objects on canvas
         self._canvasObjects = [SimpleTextBoxNode(position=[20, 20], text="A", boundingBoxDimensions=[30,20]),
@@ -62,15 +62,11 @@ class Canvas(wx.ScrolledWindow):
         self._resizingObject = None
         self._firstTimeRender = True;
 
-        self._dcBuffer = wx.Bitmap(*self.canvasDimensions)
-        self.Render()
-        self.Bind(wx.EVT_PAINT,
-                  lambda evt: wx.BufferedPaintDC(self, self._dcBuffer, wx.BUFFER_VIRTUAL_AREA)
-                  )
-
-
-        # Rendering initialization
-        # self.Render()
+        self.buffer = wx.Bitmap(*self.canvasDimensions)
+        dc = wx.BufferedDC(None, self.buffer)
+        dc.SetBackground(wx.Brush(self.GetBackgroundColour()))
+        dc.Clear()
+        self.DoDrawing(dc)
 
         # User interaction handling
         self.Bind(wx.EVT_MOTION, self.OnMouseMotion)
@@ -78,6 +74,7 @@ class Canvas(wx.ScrolledWindow):
         self.Bind(wx.EVT_LEFT_UP, self.OnMouseLeftUp)
 
         self.Bind(wx.EVT_KEY_DOWN, self.OnKeyPress)
+        self.Bind(wx.EVT_PAINT, self.OnPaint)
 
 
 
@@ -86,6 +83,37 @@ class Canvas(wx.ScrolledWindow):
         self.horizontalInterval = 40
         self.verticalInterval = 20
 
+    def OnSize(self, event):
+        self.buffer = wx.Bitmap(*self.canvasDimensions)
+        self.UpdateDrawing()
+
+    def OnPaint(self, event):
+        dc = wx.BufferedPaintDC(self, self.buffer, wx.BUFFER_VIRTUAL_AREA)
+        dc.Clear()
+        self.DoDrawing(dc)
+
+    def DoDrawing(self, dc, printing=False):
+
+
+        self._soundBoardBG.Render(dc)
+
+        for obj in self._canvasObjects:
+            obj.Render(dc)
+
+        # self.RefreshPaintingArea(dc)
+
+
+    def RefreshPaintingArea(self, dc):
+        x1, y1, x2, y2 = dc.GetBoundingBox()
+        x1, y1 = self.CalcScrolledPosition(x1, y1)
+        x2, y2 = self.CalcScrolledPosition(x2, y2)
+        # make a rectangle
+        rect = wx.Rect()
+        rect.SetTopLeft((x1, y1))
+        rect.SetBottomRight((x2, y2))
+        rect.Inflate(2, 2)
+        # refresh it
+        self.RefreshRect(rect)
 
     def CreateNodeFromDescriptionAtPosition(self, nodeDescription, pos):
         node = self._nodesFactory.CreateNodeFromDescription(nodeDescription)
@@ -97,48 +125,36 @@ class Canvas(wx.ScrolledWindow):
     def Render(self):
         cdc = wx.ClientDC(self)
         self.PrepareDC(cdc)
-        dc = wx.BufferedDC(cdc, self._dcBuffer)
-        dc.Clear()
-        gc = wx.GraphicsContext.Create(dc)
+        gc = wx.BufferedDC(cdc, self.buffer)
+        gc.Clear()
+        # dc.SetUserScale(2, 2)
 
         gc.SetBrush(wx.Brush('#00aaaa', wx.SOLID))
         gc.SetPen(wx.Pen('#00aaaa', 1, wx.SOLID))
 
-        font = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
-        font.SetWeight(wx.BOLD)
-        gc.SetFont(font, wx.Colour())
+        scrolliewData = (self.GetViewStart()[0] * self.scrollStep,
+                         self.GetViewStart()[1] * self.scrollStep,
+                         *self.GetTargetWindow().BestVirtualSize)
 
-
-
-        gc.PushState()
         self._soundBoardBG.Render(gc)
-        gc.PopState()
 
         for obj in self._canvasObjects:
-            gc.PushState()
             obj.Render(gc)
-            gc.PopState()
 
         if self._selectedObject:
-            gc.PushState()
             self._selectedObject.RenderSelection(gc)
-            gc.PopState()
 
         if (self._objectUnderCursor or self._draggingObject) and not self._resizingObject:
-            gc.PushState()
             if self._objectUnderCursor:
                 self._objectUnderCursor.RenderHighlighting(gc)
             else:
                 self._draggingObject.RenderHighlighting(gc)
-            gc.PopState()
 
         if (self._objectUnderResizingGrippers or self._resizingObject) and not self._draggingObject:
-            gc.PushState()
             if self._objectUnderResizingGrippers:
                 self._objectUnderResizingGrippers.RenderResizing(gc)
             else:
                 self._resizingObject.RenderResizing(gc)
-            gc.PopState()
 
 
     def OnMouseMotion(self, evt):
@@ -187,12 +203,10 @@ class Canvas(wx.ScrolledWindow):
                     self._resizingObject.boundingBoxDimensions = \
                         [self._resizingObject.boundingBoxDimensions[0] + dx,
                          self._resizingObject.boundingBoxDimensions[1]]
+
         self.Render()
-
-
-
         self._lastDraggingPosition = [min(pos[0], self.canvasDimensions[0]), min(pos[1], self.canvasDimensions[1])]
-
+        self.Update()
 
     def OnMouseLeftDown(self, evt):
         if self._objectUnderCursor:
@@ -273,101 +287,3 @@ class Canvas(wx.ScrolledWindow):
 
 def roundup(x, y):
     return int(math.ceil(x / y)) * y
-
-class Frame(wx.ScrolledWindow):
-    def __init__(self, parent):
-        wx.Frame.__init__(self, parent, -1)
-
-        self.display = PygameDisplay(self, -1)
-
-        self.Bind(wx.EVT_SIZE, self.OnSize)
-        self.Bind(wx.EVT_CLOSE, self.Kill)
-
-        self.curframe = 0
-
-        self.slider = wx.Slider(self, wx.ID_ANY, 5, 1, 10, style=wx.SL_HORIZONTAL | wx.SL_LABELS)
-        self.slider.SetTickFreq(1)
-
-        self.timer = wx.Timer(self)
-
-        self.Bind(wx.EVT_SCROLL, self.OnScroll)
-        self.Bind(wx.EVT_SIZE, self.OnSize)
-        self.Bind(wx.EVT_TIMER, self.Update, self.timer)
-
-        self.timer.Start((1000.0 / self.display.fps))
-
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(self.slider, 0, flag=wx.EXPAND)
-        sizer.Add(self.display, 1, flag=wx.EXPAND)
-
-        self.SetAutoLayout(True)
-        self.SetSizer(sizer)
-        self.Layout()
-
-    def Kill(self, event):
-        self.display.Kill(event)
-        pygame.quit()
-        self.Destroy()
-
-    def OnSize(self, event):
-        self.Layout()
-
-    def Update(self, event):
-        self.curframe += 1
-        #self.statusbar.SetStatusText("Frame %i" % self.curframe, 2)
-
-    def OnScroll(self, event):
-        self.display.linespacing = self.slider.GetValue()
-
-
-class PygameDisplay(wx.Window):
-    def __init__(self, parent, ID):
-        wx.Window.__init__(self, parent, ID)
-        self.parent = parent
-        self.hwnd = self.GetHandle()
-        os.environ['SDL_VIDEODRIVER'] = 'windib'
-        os.environ['SDL_WINDOWID'] = str(self.hwnd)
-
-        pygame.display.init()
-        self.screen = pygame.display.set_mode([10000,1000])
-        self.size = self.GetSize()
-
-        self.timer = wx.Timer(self)
-        self.Bind(wx.EVT_PAINT, self.OnPaint)
-        self.Bind(wx.EVT_TIMER, self.Update, self.timer)
-        self.Bind(wx.EVT_SIZE, self.OnSize)
-
-        self.fps = 60.0
-        self.timespacing = 1000.0 / self.fps
-        self.timer.Start(self.timespacing, False)
-
-        self.linespacing = 5
-
-    def Update(self, event):
-        # Any update tasks would go here (moving sprites, advancing animation frames etc.)
-        self.Redraw()
-
-    def Redraw(self):
-        self.screen.fill((0, 0, 0))
-
-        cur = 0
-
-        while cur <= self.size[1]:
-            pygame.draw.aaline(self.screen, (255, 255, 255), (0, self.size[1] - cur), (cur, 0))
-
-            cur += self.linespacing
-
-        pygame.display.update()
-
-    def OnPaint(self, event):
-        self.Redraw()
-
-    def OnSize(self, event):
-        self.size = self.GetSize()
-
-    def Kill(self, event):
-        # Make sure Pygame can't be asked to redraw /before/ quitting by unbinding all methods which
-        # call the Redraw() method
-        # (Otherwise wx seems to call Draw between quitting Pygame and destroying the frame)
-        self.Unbind(event=wx.EVT_PAINT, handler=self.OnPaint)
-        self.Unbind(event=wx.EVT_TIMER, handler=self.Update, source=self.timer)

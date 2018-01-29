@@ -106,7 +106,7 @@ class SoundBoardBG(object):
         font.SetWeight(wx.BOLD)
         color = wx.Colour()
         color.Set('#ffffff') if note.halfNote else color.Set('#000000')
-        gc.SetFont(font, color)
+        gc.SetFont(font)
 
         textDimensions = gc.GetTextExtent(note.name)
 
