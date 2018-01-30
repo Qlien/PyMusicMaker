@@ -191,9 +191,9 @@ class Canvas(wx.ScrolledWindow):
             if self._resizingObject.leftGripper == True:
                 rx = roundup(newX - self._soundBoardBG.xBegin - (self._soundBoardBG.columnWidth / 2),
                              (self._soundBoardBG.columnWidth + self._soundBoardBG.columnSpacing))
+                newWidth = self._resizingObject.boundingBoxDimensions[0] + self._resizingObject.position[0] - rx - self._soundBoardBG.xBegin
 
-                if newX >= self._resizingObject.minimumClipSize[0]:
-                    newWidth = self._resizingObject.boundingBoxDimensions[0] + self._resizingObject.position[0] - rx - self._soundBoardBG.xBegin
+                if newWidth >= self._resizingObject.minimumClipSize[0]:
                     self._resizingObject.position = [rx + self._soundBoardBG.xBegin, self._resizingObject.position[1]]
                     self._resizingObject.boundingBoxDimensions = \
                         [newWidth,
@@ -201,9 +201,8 @@ class Canvas(wx.ScrolledWindow):
             else:
                 rx = roundup(newX - self._soundBoardBG.xBegin - (self._soundBoardBG.columnWidth / 2),
                              (self._soundBoardBG.columnWidth + self._soundBoardBG.columnSpacing))
-
-                if self._resizingObject.boundingBoxDimensions[0] + newX >= self._resizingObject.minimumClipSize[1]:
-                    newWidth = rx + self._soundBoardBG.xBegin - self._resizingObject.position[0]
+                newWidth = rx + self._soundBoardBG.xBegin - self._resizingObject.position[0]
+                if newWidth >= self._resizingObject.minimumClipSize[1]:
                     self._resizingObject.boundingBoxDimensions = \
                         [newWidth,
                          self._resizingObject.boundingBoxDimensions[1]]
