@@ -26,7 +26,7 @@ class Canvas(wx.ScrolledWindow):
     def __init__(self, parent, id = -1, size = wx.DefaultSize, **kw):
         wx.ScrolledWindow.__init__(self, parent, id, (0, 0), size=size, style=wx.SUNKEN_BORDER)
 
-        self.scrollStep = kw.get("scrollStep", 20)
+        self.scrollStep = kw.get("scrollStep", 30)
         self._soundBoardBG = SoundBoardBG(parts=20)
         self.canvasDimensions = kw.get("canvasDimensions", [1 + self._soundBoardBG.xBegin +
                                                             (self._soundBoardBG.parts *
@@ -60,6 +60,7 @@ class Canvas(wx.ScrolledWindow):
         self._selectedObject = None
         self._objectUnderResizingGrippers = None
         self._resizingObject = None
+        self._elementStartDragPosition = None
         self._firstTimeRender = True;
 
         self.buffer = wx.Bitmap(*self.canvasDimensions)
@@ -82,7 +83,7 @@ class Canvas(wx.ScrolledWindow):
         self.horizontalInterval = 40
         self.verticalInterval = 20
     def OnPaint(self, event):
-        dc = wx.BufferedDC(self, self.buffer, wx.BUFFER_VIRTUAL_AREA)
+        dc = wx.BufferedPaintDC(self, self.buffer, wx.BUFFER_VIRTUAL_AREA)
         dc.Clear()
         self.DoDrawing(dc)
 
@@ -165,18 +166,16 @@ class Canvas(wx.ScrolledWindow):
             self._resizingObject = None
 
         if evt.LeftIsDown() and evt.Dragging() and self._draggingObject and not self._resizingObject:
-            dx = pos[0] - self._lastDraggingPosition[0]
-            dy = pos[1] - self._lastDraggingPosition[1]
-            newX = self._draggingObject.position[0] + dx
-            newY = self._draggingObject.position[1] + dy
+            x, y = self._elementStartDragPosition
+            newX = pos[0] - x
+            newY = pos[1] - y
 
             # Check canvas boundaries
             newX = min(newX, self.canvasDimensions[0] - self._draggingObject.boundingBoxDimensions[0])
             newY = min(newY, self.canvasDimensions[1] - self._draggingObject.boundingBoxDimensions[1])
             newX = max(newX, 0)
             newY = max(newY, 0)
-
-            self._draggingObject.position = [newX, newY]
+            self._draggingObject.position = [roundup(newX, 10), newY]
 
 
         if evt.LeftIsDown() and self._resizingObject and not self._draggingObject:
@@ -211,6 +210,9 @@ class Canvas(wx.ScrolledWindow):
             else:
                 if self._objectUnderCursor.movable and not self._resizingObject and not self._draggingObject:
                     self._lastDraggingPosition = self.CalcUnscrolledPosition(evt.GetPosition()).Get()
+                    self._elementStartDragPosition = \
+                        (abs(self._lastDraggingPosition[0] - self._objectUnderCursor.position[0])
+                         , abs(self._lastDraggingPosition[1] - self._objectUnderCursor.position[1]))
                     self._draggingObject = self._objectUnderCursor
 
         if self._objectUnderResizingGrippers and not self._draggingObject and not self._resizingObject:
