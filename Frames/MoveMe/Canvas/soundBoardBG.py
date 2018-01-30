@@ -95,23 +95,26 @@ class SoundBoardBG(object):
 
 
     def RenderNoteInPanel(self, note, position, size, gc):
-        gc.SetPen(wx.Pen('#000000' if note.halfNote else '#ffffff', 1, wx.SOLID))
-        gc.SetBrush(wx.Brush('#000000' if note.halfNote else '#ffffff', wx.SOLID))
+        gc.SetPen(wx.Pen('#00ac00' if note.halfNote else '#acacac', 1, wx.SOLID))
+        gc.SetBrush(wx.Brush('#ffffff' if note.halfNote else '#000000', wx.SOLID))
         gc.DrawRoundedRectangle(position[0],
                                 position[1],
                                 size[0],
                                 size[1], 3)
 
+
         font = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
         font.SetWeight(wx.BOLD)
+        # font.SetForegroundColour((255, 0, 0))
         color = wx.Colour()
-        color.Set('#ffffff') if note.halfNote else color.Set('#000000')
+        color.Set('#000000') if note.halfNote else color.Set('#ffffff')
         gc.SetFont(font)
 
         textDimensions = gc.GetTextExtent(note.name)
 
-        gc.DrawText(note.name + ' ' + str(note.key), position[0] + 10,
-                               position[1] + size[1] / 2 - textDimensions[1] / 2)
+        gc.DrawTextList([note.name + ' ' + str(note.key)]
+                        , [(position[0] + 10, position[1] + size[1] / 2 - textDimensions[1] / 2)]
+                        , [color])
 
 
 

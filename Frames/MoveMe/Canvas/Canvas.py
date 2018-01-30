@@ -64,7 +64,6 @@ class Canvas(wx.ScrolledWindow):
 
         self.buffer = wx.Bitmap(*self.canvasDimensions)
         dc = wx.BufferedDC(None, self.buffer)
-        dc.SetBackground(wx.Brush(self.GetBackgroundColour()))
         dc.Clear()
         self.DoDrawing(dc)
 
@@ -82,18 +81,12 @@ class Canvas(wx.ScrolledWindow):
 
         self.horizontalInterval = 40
         self.verticalInterval = 20
-
-    def OnSize(self, event):
-        self.buffer = wx.Bitmap(*self.canvasDimensions)
-        self.UpdateDrawing()
-
     def OnPaint(self, event):
-        dc = wx.BufferedPaintDC(self, self.buffer, wx.BUFFER_VIRTUAL_AREA)
+        dc = wx.BufferedDC(self, self.buffer, wx.BUFFER_VIRTUAL_AREA)
         dc.Clear()
         self.DoDrawing(dc)
 
     def DoDrawing(self, dc, printing=False):
-
 
         self._soundBoardBG.Render(dc)
 
@@ -125,7 +118,7 @@ class Canvas(wx.ScrolledWindow):
     def Render(self):
         cdc = wx.ClientDC(self)
         self.PrepareDC(cdc)
-        gc = wx.BufferedDC(cdc, self.buffer)
+        gc = wx.BufferedDC(cdc, self.buffer, wx.BUFFER_VIRTUAL_AREA)
         gc.Clear()
         # dc.SetUserScale(2, 2)
 
@@ -206,7 +199,6 @@ class Canvas(wx.ScrolledWindow):
 
         self.Render()
         self._lastDraggingPosition = [min(pos[0], self.canvasDimensions[0]), min(pos[1], self.canvasDimensions[1])]
-        self.Update()
 
     def OnMouseLeftDown(self, evt):
         if self._objectUnderCursor:
