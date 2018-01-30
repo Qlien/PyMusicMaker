@@ -18,10 +18,10 @@ class MyCanvas(wx.ScrolledWindow):
         self.curLine = []
         self.drawing = False
 
-        self._canvasObjects = [SimpleTextBoxNode(position=[20, 20], text="A", boundingBoxDimensions=[30,20]),
-                               SimpleTextBoxNode(position=[140, 40], text="B", boundingBoxDimensions=[30,20]),
-                               SimpleTextBoxNode(position=[60, 120], text="C", boundingBoxDimensions=[30,20]),
-                               SimpleTextBoxNode(position=[60, 120], text="C", boundingBoxDimensions=[30,20])]
+        self._canvasObjects = [SimpleTextBoxNode(position=[20, 20], text="A", boundingBoxDimensions=[30,21]),
+                               SimpleTextBoxNode(position=[140, 40], text="B", boundingBoxDimensions=[30,21]),
+                               SimpleTextBoxNode(position=[60, 120], text="C", boundingBoxDimensions=[30,21]),
+                               SimpleTextBoxNode(position=[60, 120], text="C", boundingBoxDimensions=[30,21])]
 
         self._nodesFactory = NodesFactory()
 

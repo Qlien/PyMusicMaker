@@ -45,10 +45,10 @@ class Canvas(wx.ScrolledWindow):
         self.SetBackgroundColour("WHITE")
 
         # This list stores all objects on canvas
-        self._canvasObjects = [SimpleTextBoxNode(position=[20, 20], text="A", boundingBoxDimensions=[30,20]),
-                               SimpleTextBoxNode(position=[140, 40], text="B", boundingBoxDimensions=[30,20]),
-                               SimpleTextBoxNode(position=[60, 120], text="C", boundingBoxDimensions=[30,20]),
-                               SimpleTextBoxNode(position=[60, 120], text="C", boundingBoxDimensions=[30,20])]
+        self._canvasObjects = [SimpleTextBoxNode(position=[20, 20], text="A", boundingBoxDimensions=[31,22]),
+                               SimpleTextBoxNode(position=[140, 40], text="B", boundingBoxDimensions=[31,22]),
+                               SimpleTextBoxNode(position=[60, 120], text="C", boundingBoxDimensions=[31,22]),
+                               SimpleTextBoxNode(position=[60, 120], text="C", boundingBoxDimensions=[31,22])]
         self._nodesFactory = NodesFactory()
         self.SetVirtualSize(*self.canvasDimensions)
 
@@ -61,6 +61,7 @@ class Canvas(wx.ScrolledWindow):
         self._objectUnderResizingGrippers = None
         self._resizingObject = None
         self._elementStartDragPosition = None
+        self._elementResizePosition = None
         self._firstTimeRender = True;
 
         self.buffer = wx.Bitmap(*self.canvasDimensions)
@@ -173,27 +174,38 @@ class Canvas(wx.ScrolledWindow):
             # Check canvas boundaries
             newX = min(newX, self.canvasDimensions[0] - self._draggingObject.boundingBoxDimensions[0])
             newY = min(newY, self.canvasDimensions[1] - self._draggingObject.boundingBoxDimensions[1])
-            newX = max(newX, 0)
-            newY = max(newY, 0)
-            self._draggingObject.position = [roundup(newX, 10), newY]
+            newX = max(newX, self._soundBoardBG.xBegin)
+            newY = max(newY, self._soundBoardBG.yBegin)
+            rx = roundup(newX - self._soundBoardBG.xBegin - (self._soundBoardBG.columnWidth/ 2),
+                         (self._soundBoardBG.columnWidth + self._soundBoardBG.columnSpacing))
+            ry = roundup(newY - self._soundBoardBG.yBegin - (self._soundBoardBG.rowHeight/ 2),
+                         (self._soundBoardBG.rowHeight + self._soundBoardBG.rowSpacing))
+
+            self._draggingObject.position = [rx + self._soundBoardBG.xBegin, ry +  + self._soundBoardBG.yBegin]
 
 
-        if evt.LeftIsDown() and self._resizingObject and not self._draggingObject:
-            dx = pos[0] - self._lastDraggingPosition[0]
-            dy = pos[1] - self._lastDraggingPosition[1]
-            newX = self._resizingObject.position[0] + dx
-            newY = self._resizingObject.position[1] + dy
+        if evt.LeftIsDown() and self._resizingObject and self._elementResizePosition and not self._draggingObject:
+            x, y = self._elementResizePosition
+            newX = pos[0] - x
 
             if self._resizingObject.leftGripper == True:
-                if self._resizingObject.boundingBoxDimensions[0] - dx >= 30:
-                    self._resizingObject.position = [newX, self._resizingObject.position[1]]
+                rx = roundup(newX - self._soundBoardBG.xBegin - (self._soundBoardBG.columnWidth / 2),
+                             (self._soundBoardBG.columnWidth + self._soundBoardBG.columnSpacing))
+
+                if newX >= self._resizingObject.minimumClipSize[0]:
+                    newWidth = self._resizingObject.boundingBoxDimensions[0] + self._resizingObject.position[0] - rx - self._soundBoardBG.xBegin
+                    self._resizingObject.position = [rx + self._soundBoardBG.xBegin, self._resizingObject.position[1]]
                     self._resizingObject.boundingBoxDimensions = \
-                        [self._resizingObject.boundingBoxDimensions[0] - dx,
+                        [newWidth,
                          self._resizingObject.boundingBoxDimensions[1]]
             else:
-                if self._resizingObject.boundingBoxDimensions[0] + dx >= 30:
+                rx = roundup(newX - self._soundBoardBG.xBegin - (self._soundBoardBG.columnWidth / 2),
+                             (self._soundBoardBG.columnWidth + self._soundBoardBG.columnSpacing))
+
+                if self._resizingObject.boundingBoxDimensions[0] + newX >= self._resizingObject.minimumClipSize[1]:
+                    newWidth = rx + self._soundBoardBG.xBegin - self._resizingObject.position[0]
                     self._resizingObject.boundingBoxDimensions = \
-                        [self._resizingObject.boundingBoxDimensions[0] + dx,
+                        [newWidth,
                          self._resizingObject.boundingBoxDimensions[1]]
 
         self.Render()
@@ -221,8 +233,16 @@ class Canvas(wx.ScrolledWindow):
                 self._resizingObject = self._objectUnderResizingGrippers
                 if self._lastDraggingPosition[0] <= self._objectUnderResizingGrippers.position[0]:
                     self._resizingObject.leftGripper = True
+
+                    self._elementResizePosition = \
+                        (self._lastDraggingPosition[0] - self._objectUnderResizingGrippers.position[0]
+                         , self._lastDraggingPosition[1] - self._objectUnderResizingGrippers.position[1])
                 else:
                     self._resizingObject.leftGripper = False
+
+                    self._elementResizePosition = \
+                        (self._lastDraggingPosition[0] - self._objectUnderResizingGrippers.position[0] - self._objectUnderResizingGrippers.boundingBoxDimensions[0]
+                         , self._lastDraggingPosition[1] - self._objectUnderResizingGrippers.position[1])
 
 
         if not self._objectUnderCursor or self._objectUnderResizingGrippers:

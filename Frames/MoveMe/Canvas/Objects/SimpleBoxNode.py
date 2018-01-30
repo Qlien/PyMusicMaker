@@ -20,7 +20,7 @@ class SimpleBoxNode(ClonableObject, DeletableObject, SelectableObject, Resizable
 
     def Render(self, gc):
         gc.SetBrush(wx.Brush('#00aaaa', wx.SOLID))
-        gc.SetPen(wx.Pen('#00aaaa', 1, wx.SOLID))
+        gc.SetPen(wx.Pen('#000000', 1, wx.SOLID))
         gc.DrawRoundedRectangle(self.position[0],
                                 self.position[1],
                                 self.boundingBoxDimensions[0],

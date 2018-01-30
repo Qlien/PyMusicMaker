@@ -6,5 +6,6 @@ class ResizableObject(CanvasObject):
     def __init__(self, **kwargs):
         super(ResizableObject, self).__init__(**kwargs)
 
-        self.boundingBoxDimensions = kwargs.get("boundingBoxDimensions", [0, 0])
+        self.boundingBoxDimensions = kwargs.get("boundingBoxDimensions", [31, 22])
+        self.minimumClipSize = kwargs.get("minimumClipSize", [31, 22])
         self.resizable = True
