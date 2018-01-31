@@ -3,7 +3,8 @@ import wx
 
 
 class PluginBase(object):
-    def __init__(self, type, icon):
+    def __init__(self, frameParent, type, icon):
+        self.frameParent = frameParent
         self.icon = icon
         self.pluginType = type
         self.iconSize = (100,50)
