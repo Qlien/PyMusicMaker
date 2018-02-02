@@ -1,4 +1,4 @@
-import wx, sys, os, pygame
+import wx, sys, os
 from Frames.MoveMe.Canvas.NodesFactory import NodesFactory
 from Frames.MoveMe.Canvas.Objects.SimpleTextBoxNode import SimpleTextBoxNode
 from Frames.MoveMe.Canvas.soundBoardBG import *

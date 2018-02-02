@@ -1,4 +1,4 @@
-import wx, sys, os, pygame
+import wx, sys, os
 from Frames.MoveMe.Canvas.CanvasNew import MyCanvas
 from Frames.MoveMe.Canvas.Canvas import Canvas
 
