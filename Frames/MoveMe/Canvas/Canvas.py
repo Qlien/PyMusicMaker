@@ -23,9 +23,10 @@ class Canvas(wx.ScrolledWindow):
     It also handles all user interaction.
     """
 
-    def __init__(self, parent, id = -1, size = wx.DefaultSize, **kw):
+    def __init__(self, parent, instrumentsPanel, id = -1, size = wx.DefaultSize, **kw):
         wx.ScrolledWindow.__init__(self, parent, id, (0, 0), size=size, style=wx.SUNKEN_BORDER)
 
+        self.instrumentsPanel = instrumentsPanel
         self.scrollStep = kw.get("scrollStep", 30)
         self._soundBoardBG = SoundBoardBG(parts=20)
         self.canvasDimensions = kw.get("canvasDimensions", [1 + self._soundBoardBG.xBegin +

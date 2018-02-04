@@ -8,28 +8,36 @@ import wx.lib.colourselect as csel
 class Oscillator(PluginBase):
     icon = wx.Bitmap('Plugins\Oscillator\Graphics\icon.png')
     pluginType = PluginType.SOUNDGENERATOR
-    def __init__(self, frameParent):
-        super(Oscillator, self).__init__(frameParent, PluginType.SOUNDGENERATOR, wx.Bitmap('Plugins\Oscillator\Graphics\icon.png'))
+    def __init__(self, frameParent, **kwargs):
+        super(Oscillator, self).__init__(frameParent, PluginType.SOUNDGENERATOR
+                                         , wx.Bitmap('Plugins\Oscillator\Graphics\icon.png')
+                                         , name=kwargs.get('pluginName', 'Oscillator'))
 
         self.knob1 = KC.KnobCtrl(self, -1, size=(100, 100))
         self.knob2 = KC.KnobCtrl(self, -1, size=(100, 100))
         self.knob3 = KC.KnobCtrl(self, -1, size=(100, 100))
 
+        self.isSound = kwargs.get('isSound', False)
+
         self.knob1.SetTags(range(0, 101, 5))
         self.knob1.SetAngularRange(-45, 225)
-        self.knob1.SetValue(50)
+        self.knob1.SetValue(kwargs.get('knob1Value',50))
 
         self.knob2.SetTags(range(0, 101, 5))
         self.knob2.SetAngularRange(-45, 225)
-        self.knob2.SetValue(50)
+        self.knob2.SetValue(kwargs.get('knob2Value',50))
 
         self.knob3.SetTags(range(0, 101, 5))
         self.knob3.SetAngularRange(-45, 225)
-        self.knob3.SetValue(50)
+        self.knob3.SetValue(kwargs.get('knob3Value',50))
 
         self.knobtracker1 = wx.StaticText(self, -1, "Value = " + str(self.knob1.GetValue()))
         self.knobtracker2 = wx.StaticText(self, -1, "Value = " + str(self.knob2.GetValue()))
         self.knobtracker3 = wx.StaticText(self, -1, "Value = " + str(self.knob3.GetValue()))
+
+        self.knob1BeforeSave = self.knob1.GetValue()
+        self.knob2BeforeSave = self.knob2.GetValue()
+        self.knob3BeforeSave = self.knob3.GetValue()
 
         leftknobsizer_staticbox = wx.StaticBox(self, -1, "Play With Me!")
         middleknobsizer_staticbox = wx.StaticBox(self, -1, "Change My Properties!")
@@ -46,19 +54,26 @@ class Oscillator(PluginBase):
         rightknobsizer = wx.StaticBoxSizer(tightknobsizer_staticbox, wx.VERTICAL)
 
         instrumentNameText = wx.StaticText(self, id=-1, label="Name:")
-        instrumentNameTextCtrl = wx.TextCtrl(self, id=-1, value=self.pluginName)
+        self.instrumentNameTextCtrl = wx.TextCtrl(self, id=-1, value=self.pluginName)
 
         instrumentColorText = wx.StaticText(self, id=-1, label="Color:")
-        instrumentColorPicker = wx.ColourPickerCtrl(self, id=-1,
-                                                    colour=wx.Colour(random.randint(0, 255), random.randint(0, 255),
-                                                                     random.randint(0, 255), alpha=255))
+        self.colourRed = kwargs.get('colourRed', random.randint(0, 255))
+        self.colourGreen = kwargs.get('colourGreen', random.randint(0, 255))
+        self.colourBlue = kwargs.get('colourBlue', random.randint(0, 255))
+        self.colourAlpha = kwargs.get('colourAlpha', random.randint(0, 255))
+        self.instrumentColorPicker = wx.ColourPickerCtrl(self, id=-1,
+                                                    colour=wx.Colour(self.colourRed, self.colourGreen,
+                                                                     self.colourBlue, alpha=self.colourAlpha))
+        if self.isSound:
+            self.instrumentNameTextCtrl.Disable()
+            self.instrumentColorPicker.Disable()
 
-        saveButton = wx.Button(self, -1, "Save")
+        saveButton = wx.Button(self, -1, "Modify" if self.isSound else "Generate Sound")
 
         menuStaticSizer.Add(instrumentNameText, 0, wx.ALL|wx.EXPAND, 5)
-        menuStaticSizer.Add(instrumentNameTextCtrl, 2, wx.ALL|wx.EXPAND, 5)
+        menuStaticSizer.Add(self.instrumentNameTextCtrl, 2, wx.ALL|wx.EXPAND, 5)
         menuStaticSizer.Add(instrumentColorText, 0, wx.ALL|wx.EXPAND, 5)
-        menuStaticSizer.Add(instrumentColorPicker, 0, wx.ALL|wx.EXPAND, 5)
+        menuStaticSizer.Add(self.instrumentColorPicker, 0, wx.ALL|wx.EXPAND, 5)
         menuStaticSizer.Add(saveButton, 0, wx.ALL|wx.EXPAND, 5)
 
         menusizer.Add(menuStaticSizer, 1, wx.ALL|wx.EXPAND, 5)
@@ -81,6 +96,51 @@ class Oscillator(PluginBase):
         self.Bind(KC.EVT_KC_ANGLE_CHANGED, self.OnAngleChanged1, self.knob1)
         self.Bind(KC.EVT_KC_ANGLE_CHANGED, self.OnAngleChanged2, self.knob2)
         self.Bind(KC.EVT_KC_ANGLE_CHANGED, self.OnAngleChanged3, self.knob3)
+        self.Bind(wx.EVT_COLOURPICKER_CHANGED, self.on_color_changed, self.instrumentColorPicker)
+        if self.isSound:
+            self.win.Bind(wx.EVT_CLOSE, self.OnExitApp)
+
+        if self.isSound:
+            self.Bind(wx.EVT_WINDOW_DESTROY, self.on_close)
+            self.Bind(wx.EVT_BUTTON, self.on_modify)
+        else:
+            self.Bind(wx.EVT_BUTTON, self.on_save)
+
+    def set_instruments_panel_window(self, instrumentsPanel):
+        self.instrumentsPanel = instrumentsPanel
+
+    def OnExitApp(self, event):
+        self.show_window(False)
+
+    def on_close(self, event):
+        self.knob1.SetValue(self.knob1BeforeSave)
+        self.knob2.SetValue(self.knob2BeforeSave)
+        self.knob3.SetValue(self.knob3BeforeSave)
+
+        print('closing')
+
+    def on_modify(self, event):
+        self.knob1BeforeSave = self.knob1.GetValue()
+        self.knob2BeforeSave = self.knob2.GetValue()
+        self.knob3BeforeSave = self.knob3.GetValue()
+
+        print('closing')
+
+    def on_save(self, event):
+        d = {'isSound':True,
+            'knob1Value':self.knob1.GetValue(),
+            'knob2Value':self.knob2.GetValue(),
+            'knob3Value':self.knob3.GetValue(),
+            'colourRed':self.colourRed,
+            'colourGreen':self.colourGreen,
+            'colourBlue':self.colourBlue,
+            'colourAlpha':self.colourAlpha,
+            'pluginName':self.instrumentNameTextCtrl.GetValue()}
+        self.instrumentsPanel.add_instrument(Oscillator, d)
+
+
+    def generateSound(self, parentWindow):
+        raise NotImplementedError
 
     def OnAngleChanged1(self, event):
 
@@ -99,3 +159,10 @@ class Oscillator(PluginBase):
         value = event.GetValue()
         self.knobtracker3.SetLabel("Value = " + str(value))
         self.knobtracker3.Refresh()
+
+    def on_color_changed(self, event):
+
+        self.colourRed = event.GetColour().red
+        self.colourGreen = event.GetColour().green
+        self.colourBlue = event.GetColour().blue
+        self.colourAlpha = event.GetColour().alpha

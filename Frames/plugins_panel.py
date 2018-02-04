@@ -5,24 +5,28 @@ import pkgutil
 from plugin import PluginType
 
 
-def generate_plugins_frame(parent):
+def generate_plugins_panel(parent, instrumentsPanel):
     win = wx.MDIChildFrame(parent, -1, "Plugins", size=(110,600), pos=(0,0), style=wx.DEFAULT_FRAME_STYLE ^ wx.MINIMIZE_BOX ^ wx.MAXIMIZE_BOX)
     s = wx.BoxSizer(wx.VERTICAL)
-    s.Add(MineDrop(win, parent), 1, wx.EXPAND)
+    panel = PluginsPanel(win, parent, instrumentsPanel)
+    s.Add(panel, 1, wx.EXPAND)
     win.SetSizer(s)
     win.SetSizeHints(110,600, 1200, 1200)
     win.Show(True)
+    return panel
 
-class MineDrop(wx.Panel):
-    def __init__(self, parent, frameParent):
+class PluginsPanel(wx.Panel):
+    def __init__(self, parent, frameParent, instrumentsPanel):
         self.frameParent = frameParent
         self.associationData = {}
-
+        self.instrumentsPanel = instrumentsPanel
         wx.Panel.__init__(self, parent)
 
+        self.instrumentsText = wx.StaticText(self, -1, "Instruments")
         #listView initialization
         self.listView = wx.ListView(self, -1, style=wx.TR_DEFAULT_STYLE + wx.TR_HIDE_ROOT + wx.TR_HAS_VARIABLE_ROW_HEIGHT)
         s = wx.BoxSizer(wx.VERTICAL)
+        s.Add(self.instrumentsText, 0, wx.EXPAND)
         s.Add(self.listView, 1, wx.EXPAND)
         self.SetSizer(s)
 
@@ -62,6 +66,7 @@ class MineDrop(wx.Panel):
                 pass
 
         self.listView.AssignImageList(image_list, wx.IMAGE_LIST_SMALL)
+        self.Layout()
 
     #when item starts to be dragged
     def OnDragInit(self, event):
@@ -78,6 +83,7 @@ class MineDrop(wx.Panel):
         itemb = event.GetIndex()
         item = self.listView.GetItemData(itemb)
         classInstance = self.associationData[item](self.frameParent)
+        classInstance.set_instruments_panel_window(self.instrumentsPanel)
 
     #for finding plugins in folder
     def searchForPlugins(self):

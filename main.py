@@ -1,9 +1,9 @@
 import wx
 from toolbarHelper import *
 from windowsHelper import *
-from Frames.plugins_tree_frame import *
-from Frames.instruments_frame import *
-from Frames.soundboard_frame import *
+from Frames.plugins_panel import *
+from Frames.instruments_panel import *
+from Frames.soundboard_panel import *
 
 
 class MDIFrame(wx.MDIParentFrame):
@@ -18,9 +18,9 @@ class MDIFrame(wx.MDIParentFrame):
         self.Bind(wx.EVT_MENU, self.on_exit, id=5001)
 
         generate_play_menu_toolbar(self, self.on_exit, self.on_exit, self.on_exit, self.on_exit)
-        generate_plugins_frame(self)
-        generate_instruments_frame(self)
-        generate_soundboard_frame(self)
+        instrumentsPanel = generate_instruments_panel(self)
+        pluginsPanel = generate_plugins_panel(self, instrumentsPanel)
+        soundBoardPanel = generate_soundboard_panel(self, instrumentsPanel)
         #generate_keyboard_window(self)
 
     def on_exit(self, evt):
