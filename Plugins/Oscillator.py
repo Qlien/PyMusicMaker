@@ -60,7 +60,7 @@ class Oscillator(PluginBase):
         self.colourRed = kwargs.get('colourRed', random.randint(0, 255))
         self.colourGreen = kwargs.get('colourGreen', random.randint(0, 255))
         self.colourBlue = kwargs.get('colourBlue', random.randint(0, 255))
-        self.colourAlpha = kwargs.get('colourAlpha', random.randint(0, 255))
+        self.colourAlpha = kwargs.get('colourAlpha', 255)
         self.instrumentColorPicker = wx.ColourPickerCtrl(self, id=-1,
                                                     colour=wx.Colour(self.colourRed, self.colourGreen,
                                                                      self.colourBlue, alpha=self.colourAlpha))
@@ -111,6 +111,9 @@ class Oscillator(PluginBase):
 
     def OnExitApp(self, event):
         self.show_window(False)
+
+    def get_color(self):
+        return self.instrumentColorPicker.GetColour()
 
     def on_close(self, event):
         self.knob1.SetValue(self.knob1BeforeSave)

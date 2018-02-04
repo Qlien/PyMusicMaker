@@ -17,9 +17,10 @@ class SimpleBoxNode(ClonableObject, DeletableObject, SelectableObject, Resizable
 
     def __init__(self, **kwargs):
         super(SimpleBoxNode, self).__init__(**kwargs)
+        self.color = kwargs.get('color', wx.Colour('#00aaaa'))
 
     def Render(self, gc):
-        gc.SetBrush(wx.Brush('#00aaaa', wx.SOLID))
+        gc.SetBrush(wx.Brush(self.color, wx.SOLID))
         gc.SetPen(wx.Pen('#000000', 1, wx.SOLID))
         gc.DrawRoundedRectangle(self.position[0],
                                 self.position[1],

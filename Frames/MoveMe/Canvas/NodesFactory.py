@@ -6,5 +6,5 @@ class NodesFactory(object):
     def __init__(self):
         pass
 
-    def CreateNodeFromDescription(self, nodeDescription):
-        return SimpleTextBoxNode(text=nodeDescription)
+    def CreateNodeFromDescription(self, **kwargs):
+        return SimpleTextBoxNode(**kwargs)

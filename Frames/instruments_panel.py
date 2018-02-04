@@ -32,7 +32,7 @@ class Instruments(wx.Panel):
 
         self.generateList(size=(20,20))
 
-        self.listView.Bind(wx.EVT_CONTEXT_MENU,self.showPopupMenu)
+        self.listView.Bind(wx.EVT_CONTEXT_MENU, self.showPopupMenu)
 
         self.listView.SetAutoLayout(True)
         self.createMenu()
@@ -53,6 +53,9 @@ class Instruments(wx.Panel):
 
     def update_instruments(self):
         self.generateList(size=(20, 20))
+
+    def get_selected_instrument(self):
+        return self.instruments[self.listView.GetItemText(self.listView.GetFirstSelected())]
 
     def createMenu(self):
         self.menu = wx.Menu()
