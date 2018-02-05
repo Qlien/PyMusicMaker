@@ -1,12 +1,15 @@
 import wx
 
-
 basicNotesKeys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
-keys = [ 2, 3, 4, 5, 6]
+keys = [3, 4, 5, 6]
+
+
 def frequencyFormula(n):
-    return (2**((n-49)/12))*440 #hz
+    return (2 ** ((n - 49) / 12)) * 440  # hz
+
 
 firstKeyN = 28
+
 
 class Note(object):
     def __init__(self, **kwargs):
@@ -29,6 +32,7 @@ class Note(object):
     def __lt__(self, other):
         return self.frequency < other.frequency
 
+
 class SoundBoardBG(object):
     def __init__(self, **kwargs):
         self.zoom = kwargs.get("zoom", 1)
@@ -50,14 +54,16 @@ class SoundBoardBG(object):
                 self.notes.append(
                     Note(name=note,
                          halfNote=True if '#' in note else False,
-                         frequency=frequencyFormula(firstKeyN + (k_2 + 1) * k_1),
+                         frequency=frequencyFormula(firstKeyN + (len(basicNotesKeys) * k_1) + k_2),
                          key=key))
+        self.notes.reverse()
 
     def render(self, gc):
 
         self.RenderGrid(gc)
         for k, note in enumerate(self.notes):
-            self.RenderNoteInPanel(note, position = (-2, self.yBegin + k * (self.noteHeight + self.rowSpacing)), size = (40,20), gc = gc)
+            self.RenderNoteInPanel(note, position=(-2, self.yBegin + k * (self.noteHeight + self.rowSpacing)),
+                                   size=(40, 20), gc=gc)
 
     def render_grid_play_line(self, gc, pos1, pos2):
         gc.SetPen(wx.Pen('#ff0000', 1, wx.SOLID))
@@ -67,7 +73,7 @@ class SoundBoardBG(object):
 
     def RenderGrid(self, gc):
 
-        #columns
+        # columns
         gc.SetPen(wx.Pen('#000000', 1, wx.SOLID))
         for part in range(self.parts):
             for subPart in range(self.subParts):
@@ -85,19 +91,20 @@ class SoundBoardBG(object):
                                          (self.xBegin + col * (self.columnWidth + self.columnSpacing),
                                           self.yBegin + (len(self.notes)) * (self.noteHeight + self.rowSpacing))])
 
-
-        gc.DrawLines(points=[(self.xBegin + (self.parts * self.columnsInSubPart * self.subParts) * (self.columnWidth + self.columnSpacing),
+        gc.DrawLines(points=[(self.xBegin + (self.parts * self.columnsInSubPart * self.subParts) * (
+                self.columnWidth + self.columnSpacing),
                               self.yBegin),
-                             (self.xBegin + (self.parts * self.columnsInSubPart * self.subParts) * (self.columnWidth + self.columnSpacing),
+                             (self.xBegin + (self.parts * self.columnsInSubPart * self.subParts) * (
+                                     self.columnWidth + self.columnSpacing),
                               self.yBegin + (len(self.notes)) * (self.noteHeight + self.rowSpacing))])
 
-        #rows
+        # rows
         for note in range(len(self.notes) + 1):
             gc.DrawLines(points=[(self.xBegin
                                   , self.yBegin + note * (self.rowHeight + self.rowSpacing)),
-                                 (self.xBegin + (self.parts * self.columnsInSubPart * self.subParts * (self.columnWidth + self.columnSpacing))
+                                 (self.xBegin + (self.parts * self.columnsInSubPart * self.subParts * (
+                                         self.columnWidth + self.columnSpacing))
                                   , self.yBegin + note * (self.rowHeight + self.rowSpacing))])
-
 
     def RenderNoteInPanel(self, note, position, size, gc):
         gc.SetPen(wx.Pen('#00ac00' if note.halfNote else '#acacac', 1, wx.SOLID))
@@ -106,7 +113,6 @@ class SoundBoardBG(object):
                                 position[1],
                                 size[0],
                                 size[1], 3)
-
 
         font = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
         font.SetWeight(wx.BOLD)
@@ -120,7 +126,3 @@ class SoundBoardBG(object):
         gc.DrawTextList([note.name + ' ' + str(note.key)]
                         , [(position[0] + 10, position[1] + size[1] / 2 - textDimensions[1] / 2)]
                         , [color])
-
-
-
-

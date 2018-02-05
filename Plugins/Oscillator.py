@@ -98,7 +98,7 @@ class Oscillator(PluginBase):
         self.SetSizer(panelsizer)
         panelsizer.Layout()
         self.sound = None
-        pygame.mixer.pre_init(44100, -16, 1, 512)
+        pygame.mixer.pre_init(44100, -16, 1, 2048)
         pygame.mixer.init()
 
         self.Bind(KC.EVT_KC_ANGLE_CHANGED, self.on_angle_changed1, self.knob1)
@@ -139,9 +139,13 @@ class Oscillator(PluginBase):
         buf = np.zeros(n_samples, dtype=np.int16)
         max_sample = 2 ** (bits - 1) - 1
 
+        from scipy.fftpack import fft
+        last_part_fade_start = sample_rate/100
         for s in range(n_samples):
             t = float(s) / sample_rate  # time in seconds
-            buf[s] = int(round(max_sample * math.sin(2 * math.pi * frequency * t)))
+            buf[s] = int(round(max_sample * math.sin(2 * math.pi * frequency * t) * (1 if s < (n_samples - last_part_fade_start) else ( (n_samples - s)/ last_part_fade_start))))
+
+        f = fft(buf)
 
         return buf
 

@@ -1,6 +1,5 @@
 import wx
 from toolbarHelper import *
-from windowsHelper import *
 from Frames.plugins_panel import *
 from Frames.instruments_panel import *
 from Frames.soundboard_panel import *

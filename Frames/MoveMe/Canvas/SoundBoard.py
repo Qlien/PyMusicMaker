@@ -89,8 +89,9 @@ class SoundBoard(wx.ScrolledWindow):
         self.Bind(wx.EVT_PAINT, self.on_paint)
         self.Bind(wx.EVT_KEY_DOWN, self.on_char)
 
+        pygame.mixer.quit()
         pygame.mixer.pre_init(44100, -16, 1, 512)
-        pygame.mixer.init()
+        pygame.mixer.init(44100, -16, 1, 512)
 
         self.SetDropTarget(TextDropTarget(self))
 
@@ -112,7 +113,7 @@ class SoundBoard(wx.ScrolledWindow):
                               sound.position[0] == (x_beginning + x_distance * i)]
             for note in notes_in_place:
                 frequency_n = int((note.position[1] - y_beginning) / y_distance)
-                frequency = frequencyFormula(frequency_n)
+                frequency = self._soundBoardBG.notes[frequency_n].frequency
                 instrument = self.instrumentsPanel.instruments[note.text]
                 note_duration = float(note.boundingBoxDimensions[0]) / float(x_distance) * (60 / 128) * (1 / 4)
                 sound = instrument.generateSound(frequency=frequency, duration=note_duration, sample_rate=44100,
