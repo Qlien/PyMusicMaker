@@ -96,6 +96,8 @@ class Oscillator(PluginBase):
         self.SetSizer(panelsizer)
         panelsizer.Layout()
         self.sound = None
+        pygame.mixer.pre_init(44100, -16, 1, 512)
+        pygame.mixer.init()
 
         self.Bind(KC.EVT_KC_ANGLE_CHANGED, self.OnAngleChanged1, self.knob1)
         self.Bind(KC.EVT_KC_ANGLE_CHANGED, self.OnAngleChanged2, self.knob2)
@@ -127,10 +129,9 @@ class Oscillator(PluginBase):
             # the number of channels specified here is NOT
             # the channels talked about here http://www.pygame.org/docs/ref/mixer.html#pygame.mixer.get_num_channels
 
-            pygame.mixer.pre_init(44100, -bits, 1, 512)
-            pygame.mixer.init()
 
-            duration = 10.0  # in seconds
+
+            duration = 1.0  # in seconds
             # freqency for the left speaker
             frequency_l = 1000
             # frequency for the right speaker

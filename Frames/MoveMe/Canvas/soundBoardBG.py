@@ -53,12 +53,17 @@ class SoundBoardBG(object):
                          frequency = frequencyFormula(firstKeyN + (k_2 + 1) * k_2),
                          key = key))
 
-
     def render(self, gc):
 
         self.RenderGrid(gc)
         for k, note in enumerate(self.notes):
             self.RenderNoteInPanel(note, position = (-2, self.yBegin + k * (self.noteHeight + self.rowSpacing)), size = (40,20), gc = gc)
+
+    def render_grid_play_line(self, gc, pos1, pos2):
+        gc.SetPen(wx.Pen('#ff0000', 1, wx.SOLID))
+
+        gc.DrawLines(points=[pos1,
+                             pos2])
 
     def RenderGrid(self, gc):
 
