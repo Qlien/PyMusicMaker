@@ -23,6 +23,7 @@ class PluginBase(wx.Panel):
     def on_char(self, event):
         if event.GetUnicodeKey() == wx.WXK_SPACE:
             pass
+        event.Skip()
 
     def generateSound(self, parentWindow):
         raise NotImplementedError

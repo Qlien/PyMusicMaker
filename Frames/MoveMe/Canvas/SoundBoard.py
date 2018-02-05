@@ -1,11 +1,19 @@
 # Created by Dmytro Konobrytskyi, 2013 (github.com/Akson/MoveMe)
+import threading
 
 import wx, sys, os
 from Frames.MoveMe.Canvas.NodesFactory import NodesFactory
 from Frames.MoveMe.Canvas.Objects.SimpleTextBoxNode import SimpleTextBoxNode
 from Frames.MoveMe.Canvas.soundBoardBG import *
 import math
+from threading import Thread
+import pyaudio
+import numpy as np
+import pygame
+import time
+
 BUFFERED = 0
+
 
 # Define Text Drop Target class
 class TextDropTarget(wx.TextDropTarget):
@@ -23,7 +31,7 @@ class SoundBoard(wx.ScrolledWindow):
     It also handles all user interaction.
     """
 
-    def __init__(self, parent, instrumentsPanel, id = -1, size = wx.DefaultSize, **kw):
+    def __init__(self, parent, instrumentsPanel, id=-1, size=wx.DefaultSize, **kw):
         wx.ScrolledWindow.__init__(self, parent, id, (0, 0), size=size, style=wx.SUNKEN_BORDER)
         self.parent = parent
         self.instrumentsPanel = instrumentsPanel
@@ -45,11 +53,12 @@ class SoundBoard(wx.ScrolledWindow):
                            self.canvasDimensions[1] / self.scrollStep)
         self.SetBackgroundColour("WHITE")
 
+        self._canvasObjects = []
         # This list stores all objects on canvas
-        self._canvasObjects = [SimpleTextBoxNode(position=[20, 20], text="A", boundingBoxDimensions=[31,22]),
-                               SimpleTextBoxNode(position=[140, 40], text="B", boundingBoxDimensions=[31,22]),
-                               SimpleTextBoxNode(position=[60, 120], text="C", boundingBoxDimensions=[31,22]),
-                               SimpleTextBoxNode(position=[60, 120], text="C", boundingBoxDimensions=[31,22])]
+        # self._canvasObjects = [SimpleTextBoxNode(position=[20, 20], text="A", boundingBoxDimensions=[31,22]),
+        #                        SimpleTextBoxNode(position=[140, 40], text="B", boundingBoxDimensions=[31,22]),
+        #                        SimpleTextBoxNode(position=[60, 120], text="C", boundingBoxDimensions=[31,22]),
+        #                        SimpleTextBoxNode(position=[60, 120], text="C", boundingBoxDimensions=[31,22])]
         self._nodesFactory = NodesFactory()
         self.SetVirtualSize(*self.canvasDimensions)
 
@@ -80,12 +89,39 @@ class SoundBoard(wx.ScrolledWindow):
         self.Bind(wx.EVT_PAINT, self.on_paint)
         self.Bind(wx.EVT_KEY_DOWN, self.on_char)
 
-
+        pygame.mixer.pre_init(44100, -16, 1, 512)
+        pygame.mixer.init()
 
         self.SetDropTarget(TextDropTarget(self))
 
         self.horizontalInterval = 40
         self.verticalInterval = 20
+
+    def on_play(self, event):
+        t = threading.Thread(target=self.play_song)
+        t.start()
+
+    def play_song(self):
+        small_parts = self._soundBoardBG.columnsInSubPart * self._soundBoardBG.subParts * self._soundBoardBG.parts
+        x_distance = self._soundBoardBG.columnWidth + self._soundBoardBG.columnSpacing
+        y_distance = self._soundBoardBG.rowHeight + self._soundBoardBG.rowSpacing
+        x_beginning = self._soundBoardBG.xBegin
+        y_beginning = self._soundBoardBG.yBegin
+        for i in range(20):
+            notes_in_place = [sound for sound in self._canvasObjects if
+                              sound.position[0] == (x_beginning + x_distance * i)]
+            for note in notes_in_place:
+                frequency_n = int((note.position[1] - y_beginning) / y_distance)
+                frequency = frequencyFormula(frequency_n)
+                instrument = self.instrumentsPanel.instruments[note.text]
+                note_duration = float(note.boundingBoxDimensions[0]) / float(x_distance) * (60 / 128) * (1 / 4)
+                sound = instrument.generateSound(frequency=frequency, duration=note_duration, sample_rate=44100,
+                                                 bits=16)
+                sound = pygame.sndarray.make_sound(sound)
+                # play once, then loop forever
+                sound.play()
+
+            time.sleep((60 / 128) * (1 / 4))
 
     def on_char(self, event):
         if event.GetUnicodeKey() == wx.WXK_SPACE:
@@ -138,12 +174,25 @@ class SoundBoard(wx.ScrolledWindow):
         self.RefreshRect(rect)
 
     def create_node_from_description_at_position(self, nodeDescription, pos):
-        node = self._nodesFactory.CreateNodeFromDescription(text=nodeDescription, color=self.instrumentsPanel.instruments[nodeDescription].get_color())
+        node = self._nodesFactory.CreateNodeFromDescription(text=nodeDescription,
+                                                            color=self.instrumentsPanel.instruments[
+                                                                nodeDescription].get_color())
         self.parent.SetFocus()
         if node:
             node.position = pos
             self._canvasObjects.append(node)
             self.render()
+
+    def render_play_line(self, gc, pos1, pos2):
+        pos1Copy = pos1
+        pos2Copy = pos2
+        while True:
+            self._soundBoardBG.render_grid_play_line(gc, (pos1Copy[0] + 1, pos1Copy[1]), (pos2Copy[0], pos2Copy[1]))
+            pos1Copy = (pos1Copy[0] + 1, pos1Copy[1])
+            pos2Copy = (pos2Copy[0] + 1, pos2Copy[1])
+            if pos1Copy[0] > 200:
+                pos1Copy = pos1
+                pos2Copy = pos2
 
     def render(self):
         cdc = wx.ClientDC(self)
@@ -152,6 +201,8 @@ class SoundBoard(wx.ScrolledWindow):
         gc.Clear()
         # dc.SetUserScale(2, 2)
 
+        # thread = Thread(target=self.render_play_line, args=(gc, (10, 10), (10, 300)))
+        # thread.start()
         gc.SetBrush(wx.Brush('#00aaaa', wx.SOLID))
         gc.SetPen(wx.Pen('#00aaaa', 1, wx.SOLID))
 
@@ -182,7 +233,6 @@ class SoundBoard(wx.ScrolledWindow):
             else:
                 self._resizingObject.RenderResizing(gc)
 
-
     def OnMouseMotion(self, evt):
         pos = self.CalcUnscrolledPosition(evt.GetPosition()).Get()
         self._objectUnderCursor = self.FindObjectUnderPoint(pos)
@@ -195,32 +245,35 @@ class SoundBoard(wx.ScrolledWindow):
         if self._objectUnderResizingGrippers and evt.LeftIsDown():
             self.pushObjectOnTopOfCanvas(self._objectUnderResizingGrippers)
 
-
         if not evt.LeftIsDown():
             self._draggingObject = None
             self._resizingObject = None
 
-        if (evt.LeftIsDown() and evt.Dragging() and self._draggingObject and not self._resizingObject) or self.instrumentToDraw:
-            x, y = self._elementStartDragPosition if self._elementStartDragPosition else [self.instrumentToDraw.boundingBoxDimensions[0]/2,self.instrumentToDraw.boundingBoxDimensions[1]/2]
+        if (
+                evt.LeftIsDown() and evt.Dragging() and self._draggingObject and not self._resizingObject) or self.instrumentToDraw:
+            x, y = self._elementStartDragPosition if self._elementStartDragPosition else [
+                self.instrumentToDraw.boundingBoxDimensions[0] / 2, self.instrumentToDraw.boundingBoxDimensions[1] / 2]
             newX = pos[0] - x
             newY = pos[1] - y
 
             # Check canvas boundaries
-            newX = min(newX, self.canvasDimensions[0] - (self._draggingObject.boundingBoxDimensions[0] if not self.instrumentToDraw else self.instrumentToDraw.boundingBoxDimensions[0]))
-            newY = min(newY, self.canvasDimensions[1] - (self._draggingObject.boundingBoxDimensions[1] if not self.instrumentToDraw else self.instrumentToDraw.boundingBoxDimensions[1]))
+            newX = min(newX, self.canvasDimensions[0] - (
+            self._draggingObject.boundingBoxDimensions[0] if not self.instrumentToDraw else
+            self.instrumentToDraw.boundingBoxDimensions[0]))
+            newY = min(newY, self.canvasDimensions[1] - (
+            self._draggingObject.boundingBoxDimensions[1] if not self.instrumentToDraw else
+            self.instrumentToDraw.boundingBoxDimensions[1]))
             newX = max(newX, self._soundBoardBG.xBegin)
             newY = max(newY, self._soundBoardBG.yBegin)
-            rx = roundup(newX - self._soundBoardBG.xBegin - (self._soundBoardBG.columnWidth/ 2),
+            rx = roundup(newX - self._soundBoardBG.xBegin - (self._soundBoardBG.columnWidth / 2),
                          (self._soundBoardBG.columnWidth + self._soundBoardBG.columnSpacing))
-            ry = roundup(newY - self._soundBoardBG.yBegin - (self._soundBoardBG.rowHeight/ 2),
+            ry = roundup(newY - self._soundBoardBG.yBegin - (self._soundBoardBG.rowHeight / 2),
                          (self._soundBoardBG.rowHeight + self._soundBoardBG.rowSpacing))
 
             if self.instrumentToDraw:
                 self.instrumentToDraw.position = [rx + self._soundBoardBG.xBegin, ry + + self._soundBoardBG.yBegin]
             else:
                 self._draggingObject.position = [rx + self._soundBoardBG.xBegin, ry + + self._soundBoardBG.yBegin]
-
-
 
         if evt.LeftIsDown() and self._resizingObject and self._elementResizePosition and not self._draggingObject:
             x, y = self._elementResizePosition
@@ -229,7 +282,8 @@ class SoundBoard(wx.ScrolledWindow):
             if self._resizingObject.leftGripper == True:
                 rx = roundup(newX - self._soundBoardBG.xBegin - (self._soundBoardBG.columnWidth / 2),
                              (self._soundBoardBG.columnWidth + self._soundBoardBG.columnSpacing))
-                newWidth = self._resizingObject.boundingBoxDimensions[0] + self._resizingObject.position[0] - rx - self._soundBoardBG.xBegin
+                newWidth = self._resizingObject.boundingBoxDimensions[0] + self._resizingObject.position[
+                    0] - rx - self._soundBoardBG.xBegin
 
                 if newWidth >= self._resizingObject.minimumClipSize[0]:
                     self._resizingObject.position = [rx + self._soundBoardBG.xBegin, self._resizingObject.position[1]]
@@ -282,9 +336,9 @@ class SoundBoard(wx.ScrolledWindow):
                     self._resizingObject.leftGripper = False
 
                     self._elementResizePosition = \
-                        (self._lastDraggingPosition[0] - self._objectUnderResizingGrippers.position[0] - self._objectUnderResizingGrippers.boundingBoxDimensions[0]
+                        (self._lastDraggingPosition[0] - self._objectUnderResizingGrippers.position[0] -
+                         self._objectUnderResizingGrippers.boundingBoxDimensions[0]
                          , self._lastDraggingPosition[1] - self._objectUnderResizingGrippers.position[1])
-
 
         if not self._objectUnderCursor or self._objectUnderResizingGrippers:
             return
@@ -337,6 +391,7 @@ class SoundBoard(wx.ScrolledWindow):
         if obj in self._canvasObjects:
             self._canvasObjects.remove(obj)
             self._canvasObjects.append(obj)
+
 
 def roundup(x, y):
     return int(math.ceil(x / y)) * y

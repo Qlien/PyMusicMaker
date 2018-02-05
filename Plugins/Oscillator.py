@@ -8,9 +8,11 @@ import numpy as np
 import pygame
 from pygame.locals import *
 
+
 class Oscillator(PluginBase):
     icon = wx.Bitmap('Plugins\Oscillator\Graphics\icon.png')
     pluginType = PluginType.SOUNDGENERATOR
+
     def __init__(self, frameParent, **kwargs):
         super(Oscillator, self).__init__(frameParent, PluginType.SOUNDGENERATOR
                                          , wx.Bitmap('Plugins\Oscillator\Graphics\icon.png')
@@ -24,15 +26,15 @@ class Oscillator(PluginBase):
 
         self.knob1.SetTags(range(0, 101, 5))
         self.knob1.SetAngularRange(-45, 225)
-        self.knob1.SetValue(kwargs.get('knob1Value',50))
+        self.knob1.SetValue(kwargs.get('knob1Value', 50))
 
         self.knob2.SetTags(range(0, 101, 5))
         self.knob2.SetAngularRange(-45, 225)
-        self.knob2.SetValue(kwargs.get('knob2Value',50))
+        self.knob2.SetValue(kwargs.get('knob2Value', 50))
 
         self.knob3.SetTags(range(0, 101, 5))
         self.knob3.SetAngularRange(-45, 225)
-        self.knob3.SetValue(kwargs.get('knob3Value',50))
+        self.knob3.SetValue(kwargs.get('knob3Value', 50))
 
         self.knobtracker1 = wx.StaticText(self, -1, "Value = " + str(self.knob1.GetValue()))
         self.knobtracker2 = wx.StaticText(self, -1, "Value = " + str(self.knob2.GetValue()))
@@ -65,33 +67,33 @@ class Oscillator(PluginBase):
         self.colourBlue = kwargs.get('colourBlue', random.randint(0, 255))
         self.colourAlpha = kwargs.get('colourAlpha', 255)
         self.instrumentColorPicker = wx.ColourPickerCtrl(self, id=-1,
-                                                    colour=wx.Colour(self.colourRed, self.colourGreen,
-                                                                     self.colourBlue, alpha=self.colourAlpha))
+                                                         colour=wx.Colour(self.colourRed, self.colourGreen,
+                                                                          self.colourBlue, alpha=self.colourAlpha))
         if self.isSound:
             self.instrumentNameTextCtrl.Disable()
             self.instrumentColorPicker.Disable()
 
         saveButton = wx.Button(self, -1, "Modify" if self.isSound else "Generate Sound")
 
-        menuStaticSizer.Add(instrumentNameText, 0, wx.ALL|wx.EXPAND, 5)
-        menuStaticSizer.Add(self.instrumentNameTextCtrl, 2, wx.ALL|wx.EXPAND, 5)
-        menuStaticSizer.Add(instrumentColorText, 0, wx.ALL|wx.EXPAND, 5)
-        menuStaticSizer.Add(self.instrumentColorPicker, 0, wx.ALL|wx.EXPAND, 5)
-        menuStaticSizer.Add(saveButton, 0, wx.ALL|wx.EXPAND, 5)
+        menuStaticSizer.Add(instrumentNameText, 0, wx.ALL | wx.EXPAND, 5)
+        menuStaticSizer.Add(self.instrumentNameTextCtrl, 2, wx.ALL | wx.EXPAND, 5)
+        menuStaticSizer.Add(instrumentColorText, 0, wx.ALL | wx.EXPAND, 5)
+        menuStaticSizer.Add(self.instrumentColorPicker, 0, wx.ALL | wx.EXPAND, 5)
+        menuStaticSizer.Add(saveButton, 0, wx.ALL | wx.EXPAND, 5)
 
-        menusizer.Add(menuStaticSizer, 1, wx.ALL|wx.EXPAND, 5)
-        panelsizer.Add(menusizer, 0, wx.EXPAND|wx.ALL)
+        menusizer.Add(menuStaticSizer, 1, wx.ALL | wx.EXPAND, 5)
+        panelsizer.Add(menusizer, 0, wx.EXPAND | wx.ALL)
 
-        rightknobsizer.Add(self.knob1, 1, wx.ALL|wx.EXPAND, 5)
+        rightknobsizer.Add(self.knob1, 1, wx.ALL | wx.EXPAND, 5)
         rightknobsizer.Add(self.knobtracker1, 0, wx.ALL, 5)
-        bottomsizer.Add(rightknobsizer, 1, wx.ALL|wx.EXPAND, 5)
-        middleknobsizer.Add(self.knob3, 1, wx.ALL|wx.EXPAND, 5)
+        bottomsizer.Add(rightknobsizer, 1, wx.ALL | wx.EXPAND, 5)
+        middleknobsizer.Add(self.knob3, 1, wx.ALL | wx.EXPAND, 5)
         middleknobsizer.Add(self.knobtracker3, 0, wx.ALL, 5)
-        bottomsizer.Add(middleknobsizer, 1, wx.ALL|wx.EXPAND, 5)
-        leftknobsizer.Add(self.knob2, 1, wx.ALL|wx.EXPAND, 5)
+        bottomsizer.Add(middleknobsizer, 1, wx.ALL | wx.EXPAND, 5)
+        leftknobsizer.Add(self.knob2, 1, wx.ALL | wx.EXPAND, 5)
         leftknobsizer.Add(self.knobtracker2, 0, wx.ALL, 5)
-        bottomsizer.Add(leftknobsizer, 1, wx.ALL|wx.EXPAND, 5)
-        panelsizer.Add(bottomsizer, 1, wx.EXPAND|wx.ALL, 20)
+        bottomsizer.Add(leftknobsizer, 1, wx.ALL | wx.EXPAND, 5)
+        panelsizer.Add(bottomsizer, 1, wx.EXPAND | wx.ALL, 20)
 
         self.SetSizer(panelsizer)
         panelsizer.Layout()
@@ -99,7 +101,7 @@ class Oscillator(PluginBase):
         pygame.mixer.pre_init(44100, -16, 1, 512)
         pygame.mixer.init()
 
-        self.Bind(KC.EVT_KC_ANGLE_CHANGED, self.OnAngleChanged1, self.knob1)
+        self.Bind(KC.EVT_KC_ANGLE_CHANGED, self.on_angle_changed1, self.knob1)
         self.Bind(KC.EVT_KC_ANGLE_CHANGED, self.OnAngleChanged2, self.knob2)
         self.Bind(KC.EVT_KC_ANGLE_CHANGED, self.OnAngleChanged3, self.knob3)
         self.Bind(wx.EVT_COLOURPICKER_CHANGED, self.on_color_changed, self.instrumentColorPicker)
@@ -121,42 +123,27 @@ class Oscillator(PluginBase):
 
     def on_char(self, event):
         if event.GetUnicodeKey() == wx.WXK_SPACE:
-            if self.sound:
-                #self.sound.stop()
-                pass
-            import math
-            bits = 16
-            # the number of channels specified here is NOT
-            # the channels talked about here http://www.pygame.org/docs/ref/mixer.html#pygame.mixer.get_num_channels
+            sin_sound = self.generateSound()
 
-
-
-            duration = 1.0  # in seconds
-            # freqency for the left speaker
-            frequency_l = 1000
-            # frequency for the right speaker
-            frequency_r = 550
-
-            # this sounds totally different coming out of a laptop versus coming out of headphones
-
-            sample_rate = 44100
-
-            n_samples = int(round(duration * sample_rate))
-
-            # setup our numpy array to handle 16 bit ints, which is what we set our mixer to expect with "bits" up above
-            buf = np.zeros(n_samples, dtype=np.int16)
-            max_sample = 2 ** (bits - 1) - 1
-
-            for s in range(n_samples):
-                t = float(s) / sample_rate  # time in seconds
-
-                # grab the x-coordinate of the sine wave at a given time, while constraining the sample to what our mixer is set to with "bits"
-                buf[s] = int(round(max_sample * math.sin(2 * math.pi * frequency_l * t)))  # left
-
-            self.sound = pygame.sndarray.make_sound(buf)
+            self.sound = pygame.sndarray.make_sound(sin_sound)
             # play once, then loop forever
             self.sound.play()
 
+        event.Skip()
+
+    def generateSound(self, frequency=440, duration=1.0, sample_rate=44100, bits=16):
+        import math
+        n_samples = int(round(duration * sample_rate))
+
+        # setup our numpy array to handle 16 bit ints, which is what we set our mixer to expect with "bits" up above
+        buf = np.zeros(n_samples, dtype=np.int16)
+        max_sample = 2 ** (bits - 1) - 1
+
+        for s in range(n_samples):
+            t = float(s) / sample_rate  # time in seconds
+            buf[s] = int(round(max_sample * math.sin(2 * math.pi * frequency * t)))
+
+        return buf
 
     def get_color(self):
         return self.instrumentColorPicker.GetColour()
@@ -176,22 +163,18 @@ class Oscillator(PluginBase):
         print('closing')
 
     def on_save(self, event):
-        d = {'isSound':True,
-            'knob1Value':self.knob1.GetValue(),
-            'knob2Value':self.knob2.GetValue(),
-            'knob3Value':self.knob3.GetValue(),
-            'colourRed':self.colourRed,
-            'colourGreen':self.colourGreen,
-            'colourBlue':self.colourBlue,
-            'colourAlpha':self.colourAlpha,
-            'pluginName':self.instrumentNameTextCtrl.GetValue()}
+        d = {'isSound': True,
+             'knob1Value': self.knob1.GetValue(),
+             'knob2Value': self.knob2.GetValue(),
+             'knob3Value': self.knob3.GetValue(),
+             'colourRed': self.colourRed,
+             'colourGreen': self.colourGreen,
+             'colourBlue': self.colourBlue,
+             'colourAlpha': self.colourAlpha,
+             'pluginName': self.instrumentNameTextCtrl.GetValue()}
         self.instrumentsPanel.add_instrument(Oscillator, d)
 
-
-    def generateSound(self, parentWindow):
-        raise NotImplementedError
-
-    def OnAngleChanged1(self, event):
+    def on_angle_changed1(self, event):
 
         value = event.GetValue()
         self.knobtracker1.SetLabel("Value = " + str(value))

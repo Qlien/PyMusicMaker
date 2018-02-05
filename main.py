@@ -17,10 +17,13 @@ class MDIFrame(wx.MDIParentFrame):
         self.SetMenuBar(menubar)
         self.Bind(wx.EVT_MENU, self.on_exit, id=5001)
 
-        generate_play_menu_toolbar(self, self.on_exit, self.on_exit, self.on_exit, self.on_exit)
+        play_menu = PlayMenu(self)
         instrumentsPanel = generate_instruments_panel(self)
         pluginsPanel = generate_plugins_panel(self, instrumentsPanel)
         soundBoardPanel = generate_soundboard_panel(self, instrumentsPanel)
+
+        play_menu.bind_play_button(soundBoardPanel.on_play)
+
         #generate_keyboard_window(self)
 
     def on_exit(self, evt):

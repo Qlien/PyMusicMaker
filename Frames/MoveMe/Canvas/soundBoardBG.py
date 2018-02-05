@@ -48,10 +48,10 @@ class SoundBoardBG(object):
         for k_1, key in enumerate(keys):
             for k_2, note in enumerate(basicNotesKeys):
                 self.notes.append(
-                    Note(name = note,
-                         halfNote = True if '#' in note else False,
-                         frequency = frequencyFormula(firstKeyN + (k_2 + 1) * k_2),
-                         key = key))
+                    Note(name=note,
+                         halfNote=True if '#' in note else False,
+                         frequency=frequencyFormula(firstKeyN + (k_2 + 1) * k_1),
+                         key=key))
 
     def render(self, gc):
 
