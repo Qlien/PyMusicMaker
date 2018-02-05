@@ -10,7 +10,7 @@ class CanvasObject(object):
         self.selectable = False
         self.resizable = False
         
-    def Render(self, gc): 
+    def render(self, gc):
         """
         Rendering method should draw an object.
         gc: GraphicsContext object that should be used for drawing.

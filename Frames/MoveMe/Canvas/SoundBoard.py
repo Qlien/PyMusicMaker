@@ -14,7 +14,7 @@ class TextDropTarget(wx.TextDropTarget):
         self._canvas = canvas
 
     def OnDropText(self, x, y, data):
-        self._canvas.CreateNodeFromDescriptionAtPosition(data, [x, y])
+        self._canvas.create_node_from_description_at_position(data, [x, y])
 
 
 class SoundBoard(wx.ScrolledWindow):
@@ -69,7 +69,7 @@ class SoundBoard(wx.ScrolledWindow):
         self.buffer = wx.Bitmap(*self.canvasDimensions)
         dc = wx.BufferedDC(None, self.buffer)
         dc.Clear()
-        self.DoDrawing(dc)
+        self.do_drawing(dc)
 
         # User interaction handling
         self.Bind(wx.EVT_MOTION, self.OnMouseMotion)
@@ -77,7 +77,6 @@ class SoundBoard(wx.ScrolledWindow):
         self.Bind(wx.EVT_LEFT_UP, self.OnMouseLeftUp)
         self.Bind(wx.EVT_RIGHT_DOWN, self.OnMouseRightDown)
 
-        self.Bind(wx.EVT_KEY_DOWN, self.OnKeyPress)
         self.Bind(wx.EVT_PAINT, self.on_paint)
         self.Bind(wx.EVT_KEY_DOWN, self.on_char)
 
@@ -91,30 +90,42 @@ class SoundBoard(wx.ScrolledWindow):
     def on_char(self, event):
         if event.GetUnicodeKey() == wx.WXK_SPACE:
             tempInstrument = self.instrumentsPanel.get_selected_instrument()
-            dim = self._canvasObjects[-1].boundingBoxDimensions if self._canvasObjects else [31, 22]
-            self.instrumentToDraw = \
-                SimpleTextBoxNode(position=[self._soundBoardBG.xBegin, self._soundBoardBG.yBegin]
-                                  , text=tempInstrument.pluginName, boundingBoxDimensions=dim
-                                  , color=tempInstrument.get_color())
+            if tempInstrument:
+                dim = self._canvasObjects[-1].boundingBoxDimensions if self._canvasObjects else [31, 22]
+                self.instrumentToDraw = \
+                    SimpleTextBoxNode(position=[self._soundBoardBG.xBegin, self._soundBoardBG.yBegin]
+                                      , text=tempInstrument.pluginName, boundingBoxDimensions=dim
+                                      , color=tempInstrument.get_color())
 
+        if event.GetKeyCode() == wx.WXK_DELETE:
+            if self._selectedObject and self._selectedObject.deletable:
+                self._selectedObject.Delete()
+                if self._selectedObject in self._canvasObjects:
+                    self._canvasObjects.remove(self._selectedObject)
+                self._selectedObject = None
+        else:
+            event.Skip()
+
+        # Update object under cursor
+        pos = self.CalcUnscrolledPosition(event.GetPosition()).Get()
+        self._objectUnderCursor = self.FindObjectUnderPoint(pos)
+
+        self.render()
+        event.Skip()
 
     def on_paint(self, event):
         dc = wx.BufferedPaintDC(self, self.buffer, wx.BUFFER_VIRTUAL_AREA)
         dc.Clear()
-        self.DoDrawing(dc)
+        self.do_drawing(dc)
 
-    def DoDrawing(self, dc, printing=False):
+    def do_drawing(self, dc, printing=False):
 
-        self._soundBoardBG.Render(dc)
+        self._soundBoardBG.render(dc)
 
         for obj in self._canvasObjects:
-            obj.Render(dc)
+            obj.render(dc)
 
-
-        # self.RefreshPaintingArea(dc)
-
-
-    def RefreshPaintingArea(self, dc):
+    def refresh_painting_area(self, dc):
         x1, y1, x2, y2 = dc.GetBoundingBox()
         x1, y1 = self.CalcScrolledPosition(x1, y1)
         x2, y2 = self.CalcScrolledPosition(x2, y2)
@@ -126,15 +137,15 @@ class SoundBoard(wx.ScrolledWindow):
         # refresh it
         self.RefreshRect(rect)
 
-    def CreateNodeFromDescriptionAtPosition(self, nodeDescription, pos):
+    def create_node_from_description_at_position(self, nodeDescription, pos):
         node = self._nodesFactory.CreateNodeFromDescription(text=nodeDescription, color=self.instrumentsPanel.instruments[nodeDescription].get_color())
         self.parent.SetFocus()
         if node:
             node.position = pos
             self._canvasObjects.append(node)
-            self.Render()
+            self.render()
 
-    def Render(self):
+    def render(self):
         cdc = wx.ClientDC(self)
         self.PrepareDC(cdc)
         gc = wx.BufferedDC(cdc, self.buffer, wx.BUFFER_VIRTUAL_AREA)
@@ -148,13 +159,13 @@ class SoundBoard(wx.ScrolledWindow):
                          self.GetViewStart()[1] * self.scrollStep,
                          *self.GetTargetWindow().BestVirtualSize)
 
-        self._soundBoardBG.Render(gc)
+        self._soundBoardBG.render(gc)
 
         for obj in self._canvasObjects:
-            obj.Render(gc)
+            obj.render(gc)
 
         if self.instrumentToDraw:
-            self.instrumentToDraw.Render(gc)
+            self.instrumentToDraw.render(gc)
 
         if self._selectedObject:
             self._selectedObject.RenderSelection(gc)
@@ -234,7 +245,7 @@ class SoundBoard(wx.ScrolledWindow):
                         [newWidth,
                          self._resizingObject.boundingBoxDimensions[1]]
 
-        self.Render()
+        self.render()
         self._lastDraggingPosition = [min(pos[0], self.canvasDimensions[0]), min(pos[1], self.canvasDimensions[1])]
 
     def OnMouseLeftDown(self, evt):
@@ -326,22 +337,6 @@ class SoundBoard(wx.ScrolledWindow):
         if obj in self._canvasObjects:
             self._canvasObjects.remove(obj)
             self._canvasObjects.append(obj)
-
-    def OnKeyPress(self, evt):
-        if evt.GetKeyCode() == wx.WXK_DELETE:
-            if self._selectedObject and self._selectedObject.deletable:
-                self._selectedObject.Delete()
-                if self._selectedObject in self._canvasObjects:
-                    self._canvasObjects.remove(self._selectedObject)
-                self._selectedObject = None
-        else:
-            evt.Skip()
-
-        # Update object under cursor
-        pos = self.CalcUnscrolledPosition(evt.GetPosition()).Get()
-        self._objectUnderCursor = self.FindObjectUnderPoint(pos)
-
-        self.Render()
 
 def roundup(x, y):
     return int(math.ceil(x / y)) * y

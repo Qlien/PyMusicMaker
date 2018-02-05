@@ -55,7 +55,8 @@ class Instruments(wx.Panel):
         self.generateList(size=(20, 20))
 
     def get_selected_instrument(self):
-        return self.instruments[self.listView.GetItemText(self.listView.GetFirstSelected())]
+        if self.listView.GetFirstSelected() >= 0:
+            return self.instruments[self.listView.GetItemText(self.listView.GetFirstSelected())]
 
     def createMenu(self):
         self.menu = wx.Menu()

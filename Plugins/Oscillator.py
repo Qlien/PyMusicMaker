@@ -3,7 +3,10 @@ import random
 from plugin import PluginBase, PluginType
 import wx.lib.agw.knobctrl as KC
 import wx.lib.colourselect as csel
-
+import pyaudio
+import numpy as np
+import pygame
+from pygame.locals import *
 
 class Oscillator(PluginBase):
     icon = wx.Bitmap('Plugins\Oscillator\Graphics\icon.png')
@@ -92,11 +95,13 @@ class Oscillator(PluginBase):
 
         self.SetSizer(panelsizer)
         panelsizer.Layout()
+        self.sound = None
 
         self.Bind(KC.EVT_KC_ANGLE_CHANGED, self.OnAngleChanged1, self.knob1)
         self.Bind(KC.EVT_KC_ANGLE_CHANGED, self.OnAngleChanged2, self.knob2)
         self.Bind(KC.EVT_KC_ANGLE_CHANGED, self.OnAngleChanged3, self.knob3)
         self.Bind(wx.EVT_COLOURPICKER_CHANGED, self.on_color_changed, self.instrumentColorPicker)
+
         if self.isSound:
             self.win.Bind(wx.EVT_CLOSE, self.OnExitApp)
 
@@ -111,6 +116,46 @@ class Oscillator(PluginBase):
 
     def OnExitApp(self, event):
         self.show_window(False)
+
+    def on_char(self, event):
+        if event.GetUnicodeKey() == wx.WXK_SPACE:
+            if self.sound:
+                #self.sound.stop()
+                pass
+            import math
+            bits = 16
+            # the number of channels specified here is NOT
+            # the channels talked about here http://www.pygame.org/docs/ref/mixer.html#pygame.mixer.get_num_channels
+
+            pygame.mixer.pre_init(44100, -bits, 1, 512)
+            pygame.mixer.init()
+
+            duration = 10.0  # in seconds
+            # freqency for the left speaker
+            frequency_l = 1000
+            # frequency for the right speaker
+            frequency_r = 550
+
+            # this sounds totally different coming out of a laptop versus coming out of headphones
+
+            sample_rate = 44100
+
+            n_samples = int(round(duration * sample_rate))
+
+            # setup our numpy array to handle 16 bit ints, which is what we set our mixer to expect with "bits" up above
+            buf = np.zeros(n_samples, dtype=np.int16)
+            max_sample = 2 ** (bits - 1) - 1
+
+            for s in range(n_samples):
+                t = float(s) / sample_rate  # time in seconds
+
+                # grab the x-coordinate of the sine wave at a given time, while constraining the sample to what our mixer is set to with "bits"
+                buf[s] = int(round(max_sample * math.sin(2 * math.pi * frequency_l * t)))  # left
+
+            self.sound = pygame.sndarray.make_sound(buf)
+            # play once, then loop forever
+            self.sound.play()
+
 
     def get_color(self):
         return self.instrumentColorPicker.GetColour()

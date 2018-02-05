@@ -54,7 +54,7 @@ class SoundBoardBG(object):
                          key = key))
 
 
-    def Render(self, gc):
+    def render(self, gc):
 
         self.RenderGrid(gc)
         for k, note in enumerate(self.notes):

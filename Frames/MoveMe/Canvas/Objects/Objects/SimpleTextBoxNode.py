@@ -9,7 +9,7 @@ class SimpleTextBoxNode(SimpleBoxNode):
     def Render(self, gc):
         textDimensions = gc.GetTextExtent(self.text)
         self.boundingBoxDimensions = [textDimensions[0]+20, textDimensions[1]+20] 
-        super(SimpleTextBoxNode, self).Render(gc)
+        super(SimpleTextBoxNode, self).render(gc)
 
         gc.DrawText(self.text, self.position[0]+10, self.position[1]+10)
         

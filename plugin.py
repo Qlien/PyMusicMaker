@@ -18,6 +18,11 @@ class PluginBase(wx.Panel):
         self.pluginType = type
         self.pluginName = name
         self.iconSize = (100,50)
+        self.Bind(wx.EVT_CHAR_HOOK, self.on_char)
+
+    def on_char(self, event):
+        if event.GetUnicodeKey() == wx.WXK_SPACE:
+            pass
 
     def generateSound(self, parentWindow):
         raise NotImplementedError
