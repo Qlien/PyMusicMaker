@@ -20,3 +20,11 @@ class SimpleTextBoxNode(SimpleBoxNode):
 
     def GetCloningNodeDescription(self):
         return self.text
+
+    def get_serialization_data(self):
+        d ={'text': self.text,
+            'boundingBoxDimensions': self.boundingBoxDimensions,
+            'color' : self.color.GetRGBA(),
+            'position': self.position}
+
+        return 'SimpleTextBoxNode', d

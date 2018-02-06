@@ -31,8 +31,9 @@ class SoundBoard(wx.ScrolledWindow):
     It also handles all user interaction.
     """
 
-    def __init__(self, parent, instrumentsPanel, id=-1, size=wx.DefaultSize, **kw):
+    def __init__(self, parent, instrumentsPanel, play_menu, id=-1, size=wx.DefaultSize, **kw):
         wx.ScrolledWindow.__init__(self, parent, id, (0, 0), size=size, style=wx.SUNKEN_BORDER)
+        self.play_menu = play_menu
         self.parent = parent
         self.instrumentsPanel = instrumentsPanel
         self.scrollStep = kw.get("scrollStep", 30)
@@ -54,11 +55,6 @@ class SoundBoard(wx.ScrolledWindow):
         self.SetBackgroundColour("WHITE")
 
         self._canvasObjects = []
-        # This list stores all objects on canvas
-        # self._canvasObjects = [SimpleTextBoxNode(position=[20, 20], text="A", boundingBoxDimensions=[31,22]),
-        #                        SimpleTextBoxNode(position=[140, 40], text="B", boundingBoxDimensions=[31,22]),
-        #                        SimpleTextBoxNode(position=[60, 120], text="C", boundingBoxDimensions=[31,22]),
-        #                        SimpleTextBoxNode(position=[60, 120], text="C", boundingBoxDimensions=[31,22])]
         self._nodesFactory = NodesFactory()
         self.SetVirtualSize(*self.canvasDimensions)
 
@@ -74,6 +70,8 @@ class SoundBoard(wx.ScrolledWindow):
         self._elementResizePosition = None
         self._firstTimeRender = True;
         self.instrumentToDraw = None
+        self.songPlayThread = None
+        self.soundPlaying = False
 
         self.buffer = wx.Bitmap(*self.canvasDimensions)
         dc = wx.BufferedDC(None, self.buffer)
@@ -89,40 +87,57 @@ class SoundBoard(wx.ScrolledWindow):
         self.Bind(wx.EVT_PAINT, self.on_paint)
         self.Bind(wx.EVT_KEY_DOWN, self.on_char)
 
-        pygame.mixer.quit()
-        pygame.mixer.pre_init(44100, -16, 1, 512)
-        pygame.mixer.init(44100, -16, 1, 512)
-
         self.SetDropTarget(TextDropTarget(self))
 
         self.horizontalInterval = 40
         self.verticalInterval = 20
 
+    def get_serialization_data(self):
+        return [noteData.get_serialization_data() for noteData in self._canvasObjects]
+
     def on_play(self, event):
-        t = threading.Thread(target=self.play_song)
-        t.start()
+        self.songPlayThread = threading.Thread(target=self.play_song)
+        self.songPlayThread.start()
+
+    def on_stop(self, event):
+        pygame.mixer.quit()
+        if self.soundPlaying:
+            self.soundPlaying = False
 
     def play_song(self):
+        if self.soundPlaying:
+            return
+        self.soundPlaying = True
+        pygame.mixer.quit()
+        pygame.mixer.pre_init(44100, -16, 1, 512)
+        pygame.mixer.init(44100, -16, 1, 512)
         small_parts = self._soundBoardBG.columnsInSubPart * self._soundBoardBG.subParts * self._soundBoardBG.parts
         x_distance = self._soundBoardBG.columnWidth + self._soundBoardBG.columnSpacing
         y_distance = self._soundBoardBG.rowHeight + self._soundBoardBG.rowSpacing
         x_beginning = self._soundBoardBG.xBegin
         y_beginning = self._soundBoardBG.yBegin
-        for i in range(20):
+        for i in range(small_parts):
             notes_in_place = [sound for sound in self._canvasObjects if
                               sound.position[0] == (x_beginning + x_distance * i)]
             for note in notes_in_place:
+
+                if not self.soundPlaying:
+                    break
+
                 frequency_n = int((note.position[1] - y_beginning) / y_distance)
                 frequency = self._soundBoardBG.notes[frequency_n].frequency
                 instrument = self.instrumentsPanel.instruments[note.text]
-                note_duration = float(note.boundingBoxDimensions[0]) / float(x_distance) * (60 / 128) * (1 / 4)
+                note_duration = float(note.boundingBoxDimensions[0]) / float(x_distance) * (60 / float(self.play_menu.bpm.GetValue())) * (1 / 4)
                 sound = instrument.generateSound(frequency=frequency, duration=note_duration, sample_rate=44100,
                                                  bits=16)
                 sound = pygame.sndarray.make_sound(sound)
                 # play once, then loop forever
                 sound.play()
 
-            time.sleep((60 / 128) * (1 / 4))
+            if not self.soundPlaying:
+                break
+
+            time.sleep((60 /  float(self.play_menu.bpm.GetValue())) * (1 / 4))
 
     def on_char(self, event):
         if event.GetUnicodeKey() == wx.WXK_SPACE:

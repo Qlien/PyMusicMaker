@@ -5,10 +5,10 @@ import pkgutil
 from plugin import PluginType
 
 
-def generate_plugins_panel(parent, instrumentsPanel):
+def generate_plugins_panel(parent):
     win = wx.MDIChildFrame(parent, -1, "Plugins", size=(110,600), pos=(0,0), style=wx.DEFAULT_FRAME_STYLE ^ wx.MINIMIZE_BOX ^ wx.MAXIMIZE_BOX)
     s = wx.BoxSizer(wx.VERTICAL)
-    panel = PluginsPanel(win, parent, instrumentsPanel)
+    panel = PluginsPanel(win, parent)
     s.Add(panel, 1, wx.EXPAND)
     win.SetSizer(s)
     win.SetSizeHints(110,600, 1200, 1200)
@@ -16,10 +16,9 @@ def generate_plugins_panel(parent, instrumentsPanel):
     return panel
 
 class PluginsPanel(wx.Panel):
-    def __init__(self, parent, frameParent, instrumentsPanel):
+    def __init__(self, parent, frameParent):
         self.frameParent = frameParent
         self.associationData = {}
-        self.instrumentsPanel = instrumentsPanel
         wx.Panel.__init__(self, parent)
 
         self.instrumentsText = wx.StaticText(self, -1, "Instruments")
@@ -38,6 +37,9 @@ class PluginsPanel(wx.Panel):
         self.generateList(size=(50,50))
 
         self.listView.SetAutoLayout(True)
+
+    def set_instruments_panel(self, instruments_panel):
+        self.instrumentsPanel = instruments_panel
 
     def generateList(self, size=(50,50)):
 

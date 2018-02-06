@@ -35,17 +35,24 @@ class Instruments(wx.Panel):
         self.listView.Bind(wx.EVT_CONTEXT_MENU, self.showPopupMenu)
 
         self.listView.SetAutoLayout(True)
-        self.createMenu()
+        self.create_menu()
 
+
+    def get_serialization_data(self):
+        return {name: instrumentData.get_serialization_data() for name, instrumentData in self.instruments.items()}
 
     def showPopupMenu(self,evt):
         position = evt.GetPosition() - self.GetScreenPosition()
         self.PopupMenu(self.menu,position)
 
-    def add_instrument(self, instrumentClass, parameters):
+    def add_instrument(self, instrument_class, parameters):
         if parameters.get('pluginName', '') in self.instruments or parameters.get('pluginName', '') == '':
-            return False
-        instrumentInstance = instrumentClass(self.frameParent, **parameters)
+            msg_box = wx.MessageDialog(self
+                                       , 'wrong name'
+                                       , 'Failed to add'
+            , wx.OK | wx.CENTRE)
+            msg_box.ShowModal()
+        instrumentInstance = instrument_class(self.frameParent, **parameters)
         instrumentInstance.show_window(False)
         self.instruments[instrumentInstance.pluginName] = instrumentInstance
         self.update_instruments()
@@ -58,15 +65,17 @@ class Instruments(wx.Panel):
         if self.listView.GetFirstSelected() >= 0:
             return self.instruments[self.listView.GetItemText(self.listView.GetFirstSelected())]
 
-    def createMenu(self):
+    def create_menu(self):
         self.menu = wx.Menu()
         item1 = self.menu.Append(-1, 'Remove')
         self.update_instruments()
 
-    def generateList(self, size=(50,50)):
-
+    def clear_instruments(self):
         self.listView.ClearAll()
         self.associationData.clear()
+
+    def generateList(self, size=(50,50)):
+        self.clear_instruments()
         info = wx.ListItem()
         info.m_mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
         info.m_image = -1

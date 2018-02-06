@@ -164,9 +164,7 @@ class Oscillator(PluginBase):
         self.knob2BeforeSave = self.knob2.GetValue()
         self.knob3BeforeSave = self.knob3.GetValue()
 
-        print('closing')
-
-    def on_save(self, event):
+    def get_serialization_data(self):
         d = {'isSound': True,
              'knob1Value': self.knob1.GetValue(),
              'knob2Value': self.knob2.GetValue(),
@@ -176,7 +174,10 @@ class Oscillator(PluginBase):
              'colourBlue': self.colourBlue,
              'colourAlpha': self.colourAlpha,
              'pluginName': self.instrumentNameTextCtrl.GetValue()}
-        self.instrumentsPanel.add_instrument(Oscillator, d)
+        return self.pluginName, d
+
+    def on_save(self, event):
+        self.instrumentsPanel.add_instrument(Oscillator, self.get_serialization_data()[1])
 
     def on_angle_changed1(self, event):
 

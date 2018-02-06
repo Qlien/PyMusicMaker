@@ -11,23 +11,23 @@ class PlayMenu():
         self.play_menu = toolbar.AddTool(wx.ID_ANY, 'Play', shortHelp='Play',
                                 bitmap=scaleImage(iconsBase + 'play-button-1.png', max_icons_size=max_icons_size))
 
-        self.pause_menu = toolbar.AddTool(wx.ID_ANY, 'Pause', shortHelp='Pause',
+        self.pause_menu = toolbar.AddTool(wx.ID_ANY, 'Stop', shortHelp='Pause',
                                 bitmap=scaleImage(iconsBase + 'pause-button.png', max_icons_size=max_icons_size))
 
-        self.repeat_menu = toolbar.AddTool(wx.ID_ANY, 'Repeat', shortHelp='Repeat',
-                                bitmap=scaleImage(iconsBase + 'repeat.png', max_icons_size=max_icons_size))
+        # self.repeat_menu = toolbar.AddTool(wx.ID_ANY, 'Repeat', shortHelp='Repeat',
+        #                         bitmap=scaleImage(iconsBase + 'repeat.png', max_icons_size=max_icons_size))
         toolbar.Realize()
 
-        text = NumCtrl(toolbar, value = 128, pos=(100, 3), size=(50, 25), fractionWidth = 1, min = 20, max = 250)
+        self.bpm = NumCtrl(toolbar, value = 128, pos=(80, 3), size=(50, 25), min = 20, max = 250)
 
     def bind_play_button(self, event_function):
         self.parent.Bind(wx.EVT_MENU, event_function, self.play_menu)
 
-    def bind_pause_button(self, event_function):
+    def bind_stop_button(self, event_function):
         self.parent.Bind(wx.EVT_MENU, event_function, self.pause_menu)
 
-    def bind_repeat_button(self, event_function):
-        self.parent.Bind(wx.EVT_MENU, event_function, self.repeat_menu)
+    # def bind_repeat_button(self, event_function):
+    #     self.parent.Bind(wx.EVT_MENU, event_function, self.repeat_menu)
 
 
 def scaleImage(image_dir, max_icons_size=(25, 25)):
