@@ -2,7 +2,6 @@
 from Frames.MoveMe.Canvas.Objects.SimpleBoxNode import SimpleBoxNode, ObjectState
 
 
-
 class SimpleTextBoxNode(SimpleBoxNode):
     def __init__(self, **kwargs):
         super(SimpleTextBoxNode, self).__init__(**kwargs)
@@ -16,15 +15,15 @@ class SimpleTextBoxNode(SimpleBoxNode):
         super(SimpleTextBoxNode, self).render(gc)
 
         gc.DrawText(self.text, self.position[0] + self.boundingBoxDimensions[0] / 2 - textDimensions[0] / 2,
-                               self.position[1] + self.boundingBoxDimensions[1] / 2 - textDimensions[1] / 2)
+                    self.position[1] + self.boundingBoxDimensions[1] / 2 - textDimensions[1] / 2)
 
     def GetCloningNodeDescription(self):
         return self.text
 
     def get_serialization_data(self):
-        d ={'text': self.text,
-            'boundingBoxDimensions': self.boundingBoxDimensions,
-            'color' : self.color.GetRGBA(),
-            'position': self.position}
+        d = {'text': self.text,
+             'boundingBoxDimensions': self.boundingBoxDimensions,
+             'color': self.color.GetRGBA(),
+             'position': self.position}
 
         return 'SimpleTextBoxNode', d

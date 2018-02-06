@@ -1,9 +1,9 @@
-import wx
-from toolbarHelper import *
-from Frames.plugins_panel import *
-from Frames.instruments_panel import *
-from Frames.soundboard_panel import *
 import json
+
+from Frames.instruments_panel import *
+from Frames.plugins_panel import *
+from Frames.soundboard_panel import *
+from toolbarHelper import *
 
 
 class MDIFrame(wx.MDIParentFrame):
@@ -53,7 +53,7 @@ class MDIFrame(wx.MDIParentFrame):
                            style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT) as fileDialog:
 
             if fileDialog.ShowModal() == wx.ID_CANCEL:
-                return     # the user changed their mind
+                return  # the user changed their mind
 
             # save the current contents in the file
             pathname = fileDialog.GetPath()
@@ -78,7 +78,7 @@ class MDIFrame(wx.MDIParentFrame):
                            style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT) as fileDialog:
 
             if fileDialog.ShowModal() == wx.ID_CANCEL:
-                return     # the user changed their mind
+                return  # the user changed their mind
 
             # save the current contents in the file
             pathname = fileDialog.GetPath()
@@ -120,7 +120,8 @@ class MDIFrame(wx.MDIParentFrame):
         self.pluginsPanel = generate_plugins_panel(self)
         self.instrumentsPanel = generate_instruments_panel(self)
         for instrument in jsonData['instruments']:
-            self.instrumentsPanel.add_instrument(getattr(self.pluginsPanel.plugins['Plugins.' + instrument[0].lower()], instrument[0]), instrument[1])
+            self.instrumentsPanel.add_instrument(
+                getattr(self.pluginsPanel.plugins['Plugins.' + instrument[0].lower()], instrument[0]), instrument[1])
 
         self.pluginsPanel.set_instruments_panel(self.instrumentsPanel)
         self.soundBoardPanel = generate_soundboard_panel(self, self.instrumentsPanel, self.play_menu)
@@ -131,6 +132,7 @@ class MDIFrame(wx.MDIParentFrame):
         self.play_menu.bind_stop_button(self.soundBoardPanel.on_stop)
 
         pass
+
 
 app = wx.App()
 frame = MDIFrame()

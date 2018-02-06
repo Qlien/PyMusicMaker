@@ -1,13 +1,11 @@
-import wx
 import random
-from plugin import PluginBase, PluginType
-import wx.lib.agw.knobctrl as KC
-import wx.lib.colourselect as csel
-import pyaudio
+
 import numpy as np
 import pygame
-from pygame.locals import *
-import math
+import wx
+import wx.lib.agw.knobctrl as KC
+
+from plugin import PluginBase, PluginType
 
 
 class Oscillator(PluginBase):
@@ -139,11 +137,11 @@ class Oscillator(PluginBase):
         max_sample = 2 ** (bits - 1) - 1
 
         sine_multiplier = (float(self.knob3.GetValue()) / 50.0) + 0.1
-        from scipy.fftpack import fft
-        last_part_fade_start = sample_rate/100
+        last_part_fade_start = sample_rate / 100
         for s in range(n_samples):
             t = float(s) / sample_rate  # time in seconds
-            buf[s] = int(round(max_sample * math.sin(2 * math.pi * frequency * t * sine_multiplier) * (1 if s < (n_samples - last_part_fade_start) else ((n_samples - s) / last_part_fade_start))))
+            buf[s] = int(round(max_sample * math.sin(2 * math.pi * frequency * t * sine_multiplier) * (
+            1 if s < (n_samples - last_part_fade_start) else ((n_samples - s) / last_part_fade_start))))
 
         self.add_noise(buf)
         self.add_fading(buf)
@@ -152,9 +150,9 @@ class Oscillator(PluginBase):
 
     def add_fading(self, arr):
         arrLen = float(len(arr))
-        a = (float(self.knob2.GetValue())/10)
+        a = (float(self.knob2.GetValue()) / 10)
         for k, x in enumerate(arr):
-            arr[k] = float(x) * ((1/(arrLen**(2*a))) * (arrLen - float(k))**(2*a))
+            arr[k] = float(x) * ((1 / (arrLen ** (2 * a))) * (arrLen - float(k)) ** (2 * a))
 
     def add_noise(self, arr):
         arrMin = min(arr)
@@ -162,7 +160,7 @@ class Oscillator(PluginBase):
         noiseValue = self.knob1.GetValue()
 
         for k, x in enumerate(arr):
-            rand = ((100 - np.random.randint(noiseValue + 1))/100)
+            rand = ((100 - np.random.randint(noiseValue + 1)) / 100)
             newValue = x + ((1 if np.random.randint(2) else -1) * (1 - rand) * arrMax)
             if newValue < arrMin:
                 arr[k] = arrMin
@@ -188,14 +186,14 @@ class Oscillator(PluginBase):
 
     def get_serialization_data(self):
         return ('Oscillator', {'isSound': True,
-             'knob1Value': self.knob1.GetValue(),
-             'knob2Value': self.knob2.GetValue(),
-             'knob3Value': self.knob3.GetValue(),
-             'colourRed': self.colourRed,
-             'colourGreen': self.colourGreen,
-             'colourBlue': self.colourBlue,
-             'colourAlpha': self.colourAlpha,
-             'pluginName': self.instrumentNameTextCtrl.GetValue()})
+                               'knob1Value': self.knob1.GetValue(),
+                               'knob2Value': self.knob2.GetValue(),
+                               'knob3Value': self.knob3.GetValue(),
+                               'colourRed': self.colourRed,
+                               'colourGreen': self.colourGreen,
+                               'colourBlue': self.colourBlue,
+                               'colourAlpha': self.colourAlpha,
+                               'pluginName': self.instrumentNameTextCtrl.GetValue()})
 
     def on_save(self, event):
         self.instrumentsPanel.add_instrument(Oscillator, self.get_serialization_data()[1])

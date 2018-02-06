@@ -1,21 +1,16 @@
-# Created by Dmytro Konobrytskyi, 2013 (github.com/Akson/MoveMe)
+import math
 import threading
 
-import wx, sys, os
+import numpy as np
+import pygame
+
 from Frames.MoveMe.Canvas.NodesFactory import NodesFactory
 from Frames.MoveMe.Canvas.Objects.SimpleTextBoxNode import SimpleTextBoxNode
 from Frames.MoveMe.Canvas.soundBoardBG import *
-import math
-from threading import Thread
-import pyaudio
-import numpy as np
-import pygame
-import time
 
 BUFFERED = 0
 
 
-# Define Text Drop Target class
 class TextDropTarget(wx.TextDropTarget):
     def __init__(self, canvas):
         wx.TextDropTarget.__init__(self)
@@ -26,10 +21,6 @@ class TextDropTarget(wx.TextDropTarget):
 
 
 class SoundBoard(wx.ScrolledWindow):
-    """
-    Canvas stores and renders all nodes and node connections.
-    It also handles all user interaction.
-    """
 
     def __init__(self, parent, instrumentsPanel, play_menu, id=-1, size=wx.DefaultSize, **kw):
         wx.ScrolledWindow.__init__(self, parent, id, (0, 0), size=size, style=wx.SUNKEN_BORDER)
@@ -80,10 +71,10 @@ class SoundBoard(wx.ScrolledWindow):
         self.do_drawing(dc)
 
         # User interaction handling
-        self.Bind(wx.EVT_MOTION, self.OnMouseMotion)
-        self.Bind(wx.EVT_LEFT_DOWN, self.OnMouseLeftDown)
-        self.Bind(wx.EVT_LEFT_UP, self.OnMouseLeftUp)
-        self.Bind(wx.EVT_RIGHT_DOWN, self.OnMouseRightDown)
+        self.Bind(wx.EVT_MOTION, self.on_mouse_motion)
+        self.Bind(wx.EVT_LEFT_DOWN, self.on_mouse_left_down)
+        self.Bind(wx.EVT_LEFT_UP, self.on_mouse_left_up)
+        self.Bind(wx.EVT_RIGHT_DOWN, self.on_mouse_right_down)
 
         self.Bind(wx.EVT_PAINT, self.on_paint)
         self.Bind(wx.EVT_KEY_DOWN, self.on_char)
@@ -142,7 +133,7 @@ class SoundBoard(wx.ScrolledWindow):
         for i in range(small_parts):
             notes_in_place = [sound for sound in self._canvasObjects if
                               sound.position[0] == (x_beginning + x_distance * i)]
-            partSound=[]
+            partSound = []
             for note in notes_in_place:
 
                 frequency_n = int((note.position[1] - y_beginning) / y_distance)
@@ -152,7 +143,7 @@ class SoundBoard(wx.ScrolledWindow):
                         60 / float(self.play_menu.bpm.GetValue())) * (1 / 4)
                 sound = instrument.generate_sound(frequency=frequency, duration=note_duration, sample_rate=44100,
                                                   bits=16)
-                for k ,v in enumerate(sound):
+                for k, v in enumerate(sound):
                     wholeSound[k + (i * smallestPartArraySize)] += v
 
                 for j in range(int(note.boundingBoxDimensions[0] / x_distance)):
@@ -189,7 +180,7 @@ class SoundBoard(wx.ScrolledWindow):
 
         # Update object under cursor
         pos = self.CalcUnscrolledPosition(event.GetPosition()).Get()
-        self._objectUnderCursor = self.FindObjectUnderPoint(pos)
+        self._objectUnderCursor = self.find_object_under_point(pos)
 
         self.render()
         event.Skip()
@@ -268,31 +259,31 @@ class SoundBoard(wx.ScrolledWindow):
             self.instrumentToDraw.render(gc)
 
         if self._selectedObject:
-            self._selectedObject.RenderSelection(gc)
+            self._selectedObject.render_selection(gc)
 
         if (self._objectUnderCursor or self._draggingObject) and not self._resizingObject:
             if self._objectUnderCursor:
-                self._objectUnderCursor.RenderHighlighting(gc)
+                self._objectUnderCursor.render_highlighting(gc)
             else:
-                self._draggingObject.RenderHighlighting(gc)
+                self._draggingObject.render_highlighting(gc)
 
         if (self._objectUnderResizingGrippers or self._resizingObject) and not self._draggingObject:
             if self._objectUnderResizingGrippers:
-                self._objectUnderResizingGrippers.RenderResizing(gc)
+                self._objectUnderResizingGrippers.render_resizing(gc)
             else:
-                self._resizingObject.RenderResizing(gc)
+                self._resizingObject.render_resizing(gc)
 
-    def OnMouseMotion(self, evt):
+    def on_mouse_motion(self, evt):
         self.lastMousePos = self.CalcUnscrolledPosition(evt.GetPosition()).Get()
-        self._objectUnderCursor = self.FindObjectUnderPoint(self.lastMousePos)
-        self._objectUnderResizingGrippers = self.FindResizingGrippersObjectUnderPoint(self.lastMousePos)
+        self._objectUnderCursor = self.find_object_under_point(self.lastMousePos)
+        self._objectUnderResizingGrippers = self.find_resizing_grippers_object_under_point(self.lastMousePos)
 
         if evt.RightIsDown():
             self.remove_element_in_pos(self.lastMousePos)
         if self._objectUnderCursor and evt.LeftIsDown():
-            self.pushObjectOnTopOfCanvas(self._objectUnderCursor)
+            self.push_object_on_top_of_canvas(self._objectUnderCursor)
         if self._objectUnderResizingGrippers and evt.LeftIsDown():
-            self.pushObjectOnTopOfCanvas(self._objectUnderResizingGrippers)
+            self.push_object_on_top_of_canvas(self._objectUnderResizingGrippers)
 
         if not evt.LeftIsDown():
             self._draggingObject = None
@@ -352,20 +343,20 @@ class SoundBoard(wx.ScrolledWindow):
         self._lastDraggingPosition = [min(self.lastMousePos[0], self.canvasDimensions[0]),
                                       min(self.lastMousePos[1], self.canvasDimensions[1])]
 
-    def OnMouseLeftDown(self, evt):
+    def on_mouse_left_down(self, evt):
         if self.instrumentToDraw:
             self._canvasObjects.append(self.instrumentToDraw)
             self.instrumentToDraw = None
 
         if self._objectUnderCursor:
-            if evt.ControlDown() and self._objectUnderCursor.clonable:
-                text = self._objectUnderCursor.GetCloningNodeDescription()
+            if evt.ControlDown():
+                text = self._objectUnderCursor.get_cloning_node_description()
                 data = wx.TextDataObject(text)
                 dropSource = wx.DropSource(self)
                 dropSource.SetData(data)
                 dropSource.DoDragDrop(wx.Drag_AllowMove)
             else:
-                if self._objectUnderCursor.movable and not self._resizingObject and not self._draggingObject:
+                if not self._resizingObject and not self._draggingObject:
                     self._lastDraggingPosition = self.CalcUnscrolledPosition(evt.GetPosition()).Get()
                     self._elementStartDragPosition = \
                         (abs(self._lastDraggingPosition[0] - self._objectUnderCursor.position[0])
@@ -373,47 +364,45 @@ class SoundBoard(wx.ScrolledWindow):
                     self._draggingObject = self._objectUnderCursor
 
         if self._objectUnderResizingGrippers and not self._draggingObject and not self._resizingObject:
-            if self._objectUnderResizingGrippers.resizable:
-                self._lastDraggingPosition = self.CalcUnscrolledPosition(evt.GetPosition()).Get()
-                self._resizingObject = self._objectUnderResizingGrippers
-                if self._lastDraggingPosition[0] <= self._objectUnderResizingGrippers.position[0]:
-                    self._resizingObject.leftGripper = True
+            self._lastDraggingPosition = self.CalcUnscrolledPosition(evt.GetPosition()).Get()
+            self._resizingObject = self._objectUnderResizingGrippers
+            if self._lastDraggingPosition[0] <= self._objectUnderResizingGrippers.position[0]:
+                self._resizingObject.leftGripper = True
 
-                    self._elementResizePosition = \
-                        (self._lastDraggingPosition[0] - self._objectUnderResizingGrippers.position[0]
-                         , self._lastDraggingPosition[1] - self._objectUnderResizingGrippers.position[1])
-                else:
-                    self._resizingObject.leftGripper = False
+                self._elementResizePosition = \
+                    (self._lastDraggingPosition[0] - self._objectUnderResizingGrippers.position[0]
+                     , self._lastDraggingPosition[1] - self._objectUnderResizingGrippers.position[1])
+            else:
+                self._resizingObject.leftGripper = False
 
-                    self._elementResizePosition = \
-                        (self._lastDraggingPosition[0] - self._objectUnderResizingGrippers.position[0] -
-                         self._objectUnderResizingGrippers.boundingBoxDimensions[0]
-                         , self._lastDraggingPosition[1] - self._objectUnderResizingGrippers.position[1])
+                self._elementResizePosition = \
+                    (self._lastDraggingPosition[0] - self._objectUnderResizingGrippers.position[0] -
+                     self._objectUnderResizingGrippers.boundingBoxDimensions[0]
+                     , self._lastDraggingPosition[1] - self._objectUnderResizingGrippers.position[1])
 
         if not self._objectUnderCursor or self._objectUnderResizingGrippers:
             return
 
         self._lastLeftDownPos = evt.GetPosition()
 
-    def OnMouseLeftUp(self, evt):
+    def on_mouse_left_up(self, evt):
         # Selection
         if (self._lastLeftDownPos
                 and self._lastLeftDownPos[0] == evt.GetPosition()[0]
                 and self._lastLeftDownPos[1] == evt.GetPosition()[1]
-                and self._objectUnderCursor
-                and self._objectUnderCursor.selectable):
+                and self._objectUnderCursor):
             self._selectedObject = self._objectUnderCursor
         elif not self._resizingObject and not self._draggingObject:
             self._selectedObject = None
 
-    def OnMouseRightDown(self, evt):
+    def on_mouse_right_down(self, evt):
         self.remove_element_in_pos(self.CalcUnscrolledPosition(evt.GetPosition()).Get())
 
     def remove_element_in_pos(self, pos):
         if self.instrumentToDraw:
             self.instrumentToDraw = None
         else:
-            objIndex = self.FindObjectUnderPoint(pos)
+            objIndex = self.find_object_under_point(pos)
             if objIndex != None and self._canvasObjects[self._canvasObjects.index(objIndex)]:
                 del self._canvasObjects[self._canvasObjects.index(objIndex)]
             if self._objectUnderCursor:
@@ -421,23 +410,23 @@ class SoundBoard(wx.ScrolledWindow):
             if self._objectUnderResizingGrippers:
                 self._objectUnderResizingGrippers = None
 
-    def FindObjectUnderPoint(self, pos):
+    def find_object_under_point(self, pos):
         # Check all objects on a canvas.
         for obj in reversed(self._canvasObjects):
-            objUnderCursor = obj.ReturnObjectUnderCursor(pos)
+            objUnderCursor = obj.return_object_under_cursor(pos)
             if objUnderCursor:
                 return objUnderCursor
         return None
 
-    def FindResizingGrippersObjectUnderPoint(self, pos):
+    def find_resizing_grippers_object_under_point(self, pos):
         # Check all objects on a canvas.
         for obj in reversed(self._canvasObjects):
-            objUnderCursor = obj.ReturnObjectUnderCursorResizingArea(pos)
+            objUnderCursor = obj.return_object_under_cursor_resizing_area(pos)
             if objUnderCursor:
                 return objUnderCursor
         return None
 
-    def pushObjectOnTopOfCanvas(self, obj):
+    def push_object_on_top_of_canvas(self, obj):
         if obj in self._canvasObjects:
             self._canvasObjects.remove(obj)
             self._canvasObjects.append(obj)
