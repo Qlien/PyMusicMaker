@@ -20,6 +20,7 @@ class PluginsPanel(wx.Panel):
         self.frameParent = frameParent
         self.associationData = {}
         wx.Panel.__init__(self, parent)
+        self.parent = parent
 
         self.instrumentsText = wx.StaticText(self, -1, "Instruments")
         #listView initialization
@@ -29,7 +30,6 @@ class PluginsPanel(wx.Panel):
         s.Add(self.listView, 1, wx.EXPAND)
         self.SetSizer(s)
 
-        self.listView.Bind(wx.EVT_LIST_BEGIN_DRAG, self.OnDragInit)
         self.listView.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnActivated)
 
         self.plugins = self.searchForPlugins()
@@ -37,6 +37,13 @@ class PluginsPanel(wx.Panel):
         self.generateList(size=(50,50))
 
         self.listView.SetAutoLayout(True)
+
+    def Destroy(self):
+        try:
+            super(wx.Panel, self).Destroy()
+            self.parent.Destroy()
+        except:
+            print('already deleted')
 
     def set_instruments_panel(self, instruments_panel):
         self.instrumentsPanel = instruments_panel
@@ -53,7 +60,7 @@ class PluginsPanel(wx.Panel):
         image_list = wx.ImageList(*size)
 
         for key, (name, plugin) in enumerate(self.plugins.items()):
-            classWrapper = getattr(plugin, name[name.find('.') + 1:])
+            classWrapper = getattr(plugin, name[name.find('.') + 1:].title())
             self.associationData[key] = classWrapper
             image = image_list.Add(
                 classWrapper.icon.ConvertToImage().Rescale(*size).ConvertToBitmap())
@@ -69,16 +76,6 @@ class PluginsPanel(wx.Panel):
 
         self.listView.AssignImageList(image_list, wx.IMAGE_LIST_SMALL)
         self.Layout()
-
-    #when item starts to be dragged
-    def OnDragInit(self, event):
-        item = self.listView.GetItemData(event.GetItem())
-        text = item.GetText()
-        tdo = wx.TextDataObject(text)
-        tds = wx.DropSource(self.listView)
-        tds.SetData(tdo)
-        tds.DoDragDrop(True)
-
 
     #when double clicked
     def OnActivated(self, event):

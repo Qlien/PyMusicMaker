@@ -17,7 +17,8 @@ class SimpleBoxNode(ClonableObject, DeletableObject, SelectableObject, Resizable
 
     def __init__(self, **kwargs):
         super(SimpleBoxNode, self).__init__(**kwargs)
-        self.color = kwargs.get('color', wx.Colour('#00aaaa'))
+        tempColor = kwargs.get('color', wx.Colour('#00aaaa'))
+        self.color = tempColor if type(tempColor) != int else wx.Colour(tempColor)
 
     def render(self, gc):
         gc.SetBrush(wx.Brush(self.color, wx.SOLID))

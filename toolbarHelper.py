@@ -26,6 +26,12 @@ class PlayMenu():
     def bind_stop_button(self, event_function):
         self.parent.Bind(wx.EVT_MENU, event_function, self.pause_menu)
 
+    def unbind_play_button(self, event_function):
+        self.parent.Unbind(event=wx.EVT_MENU, handler=event_function, source=self.play_menu)
+
+    def unbind_stop_button(self, event_function):
+        self.parent.Unbind(event=wx.EVT_MENU, handler=event_function, source=self.pause_menu)
+
     # def bind_repeat_button(self, event_function):
     #     self.parent.Bind(wx.EVT_MENU, event_function, self.repeat_menu)
 

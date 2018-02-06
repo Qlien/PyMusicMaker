@@ -5,8 +5,8 @@ import wx
 class PluginBase(wx.Panel):
     def __init__(self, frameParent, type, icon, name=''):
         self.frameParent = frameParent
-        self.win = wx.MDIChildFrame(frameParent, -1, name, size=(600,400),
-                               style=wx.DEFAULT_FRAME_STYLE ^ wx.MINIMIZE_BOX ^ wx.MAXIMIZE_BOX)
+        self.win = wx.MDIChildFrame(frameParent, -1, name, size=(600, 400),
+                                    style=wx.DEFAULT_FRAME_STYLE ^ wx.MINIMIZE_BOX ^ wx.MAXIMIZE_BOX)
 
         super(wx.Panel, self).__init__(self.win)
         icn = wx.Icon()
@@ -17,7 +17,7 @@ class PluginBase(wx.Panel):
         self.icon = icon
         self.pluginType = type
         self.pluginName = name
-        self.iconSize = (100,50)
+        self.iconSize = (100, 50)
         self.Bind(wx.EVT_CHAR_HOOK, self.on_char)
 
     def on_char(self, event):
@@ -25,7 +25,7 @@ class PluginBase(wx.Panel):
             pass
         event.Skip()
 
-    def generateSound(self, parentWindow):
+    def generate_sound(self, parentWindow):
         raise NotImplementedError
 
     def show_window(self, show):
@@ -33,6 +33,7 @@ class PluginBase(wx.Panel):
 
     def is_window_visible(self):
         return self.win.IsShown()
+
 
 class PluginType(Enum):
     SOUNDGENERATOR = 1

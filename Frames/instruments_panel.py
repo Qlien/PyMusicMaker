@@ -37,9 +37,15 @@ class Instruments(wx.Panel):
         self.listView.SetAutoLayout(True)
         self.create_menu()
 
+    def Destroy(self):
+        try:
+            super(wx.Panel, self).Destroy()
+            self.parent.Destroy()
+        except:
+            print('already deleted')
 
     def get_serialization_data(self):
-        return {name: instrumentData.get_serialization_data() for name, instrumentData in self.instruments.items()}
+        return [instrumentData.get_serialization_data() for name, instrumentData in self.instruments.items()]
 
     def showPopupMenu(self,evt):
         position = evt.GetPosition() - self.GetScreenPosition()

@@ -7,6 +7,7 @@ import pyaudio
 import numpy as np
 import pygame
 from pygame.locals import *
+import math
 
 
 class Oscillator(PluginBase):
@@ -26,11 +27,11 @@ class Oscillator(PluginBase):
 
         self.knob1.SetTags(range(0, 101, 5))
         self.knob1.SetAngularRange(-45, 225)
-        self.knob1.SetValue(kwargs.get('knob1Value', 50))
+        self.knob1.SetValue(kwargs.get('knob1Value', 0))
 
         self.knob2.SetTags(range(0, 101, 5))
         self.knob2.SetAngularRange(-45, 225)
-        self.knob2.SetValue(kwargs.get('knob2Value', 50))
+        self.knob2.SetValue(kwargs.get('knob2Value', 0))
 
         self.knob3.SetTags(range(0, 101, 5))
         self.knob3.SetAngularRange(-45, 225)
@@ -44,9 +45,9 @@ class Oscillator(PluginBase):
         self.knob2BeforeSave = self.knob2.GetValue()
         self.knob3BeforeSave = self.knob3.GetValue()
 
-        leftknobsizer_staticbox = wx.StaticBox(self, -1, "Play With Me!")
-        middleknobsizer_staticbox = wx.StaticBox(self, -1, "Change My Properties!")
-        tightknobsizer_staticbox = wx.StaticBox(self, -1, "Change My Properties!3")
+        leftknobsizer_staticbox = wx.StaticBox(self, -1, "Noise")
+        middleknobsizer_staticbox = wx.StaticBox(self, -1, "Fading")
+        tightknobsizer_staticbox = wx.StaticBox(self, -1, "Damping")
 
         menusizer_staticbox = wx.StaticBox(self, -1, "Menu")
 
@@ -84,32 +85,30 @@ class Oscillator(PluginBase):
         menusizer.Add(menuStaticSizer, 1, wx.ALL | wx.EXPAND, 5)
         panelsizer.Add(menusizer, 0, wx.EXPAND | wx.ALL)
 
-        rightknobsizer.Add(self.knob1, 1, wx.ALL | wx.EXPAND, 5)
-        rightknobsizer.Add(self.knobtracker1, 0, wx.ALL, 5)
-        bottomsizer.Add(rightknobsizer, 1, wx.ALL | wx.EXPAND, 5)
-        middleknobsizer.Add(self.knob3, 1, wx.ALL | wx.EXPAND, 5)
-        middleknobsizer.Add(self.knobtracker3, 0, wx.ALL, 5)
-        bottomsizer.Add(middleknobsizer, 1, wx.ALL | wx.EXPAND, 5)
-        leftknobsizer.Add(self.knob2, 1, wx.ALL | wx.EXPAND, 5)
-        leftknobsizer.Add(self.knobtracker2, 0, wx.ALL, 5)
+        leftknobsizer.Add(self.knob1, 1, wx.ALL | wx.EXPAND, 5)
+        leftknobsizer.Add(self.knobtracker1, 0, wx.ALL, 5)
         bottomsizer.Add(leftknobsizer, 1, wx.ALL | wx.EXPAND, 5)
+        middleknobsizer.Add(self.knob2, 1, wx.ALL | wx.EXPAND, 5)
+        middleknobsizer.Add(self.knobtracker2, 0, wx.ALL, 5)
+        bottomsizer.Add(middleknobsizer, 1, wx.ALL | wx.EXPAND, 5)
+        rightknobsizer.Add(self.knob3, 1, wx.ALL | wx.EXPAND, 5)
+        rightknobsizer.Add(self.knobtracker3, 0, wx.ALL, 5)
+        bottomsizer.Add(rightknobsizer, 1, wx.ALL | wx.EXPAND, 5)
         panelsizer.Add(bottomsizer, 1, wx.EXPAND | wx.ALL, 20)
 
         self.SetSizer(panelsizer)
         panelsizer.Layout()
         self.sound = None
-        pygame.mixer.pre_init(44100, -16, 1, 2048)
+        pygame.mixer.pre_init(44000, -16, 1, 512)
         pygame.mixer.init()
 
         self.Bind(KC.EVT_KC_ANGLE_CHANGED, self.on_angle_changed1, self.knob1)
-        self.Bind(KC.EVT_KC_ANGLE_CHANGED, self.OnAngleChanged2, self.knob2)
-        self.Bind(KC.EVT_KC_ANGLE_CHANGED, self.OnAngleChanged3, self.knob3)
+        self.Bind(KC.EVT_KC_ANGLE_CHANGED, self.on_angle_changed2, self.knob2)
+        self.Bind(KC.EVT_KC_ANGLE_CHANGED, self.on_angle_changed3, self.knob3)
         self.Bind(wx.EVT_COLOURPICKER_CHANGED, self.on_color_changed, self.instrumentColorPicker)
 
         if self.isSound:
-            self.win.Bind(wx.EVT_CLOSE, self.OnExitApp)
-
-        if self.isSound:
+            self.win.Bind(wx.EVT_CLOSE, self.on_exit_app)
             self.Bind(wx.EVT_WINDOW_DESTROY, self.on_close)
             self.Bind(wx.EVT_BUTTON, self.on_modify)
         else:
@@ -118,12 +117,12 @@ class Oscillator(PluginBase):
     def set_instruments_panel_window(self, instrumentsPanel):
         self.instrumentsPanel = instrumentsPanel
 
-    def OnExitApp(self, event):
+    def on_exit_app(self, event):
         self.show_window(False)
 
     def on_char(self, event):
         if event.GetUnicodeKey() == wx.WXK_SPACE:
-            sin_sound = self.generateSound()
+            sin_sound = self.generate_sound()
 
             self.sound = pygame.sndarray.make_sound(sin_sound)
             # play once, then loop forever
@@ -131,7 +130,7 @@ class Oscillator(PluginBase):
 
         event.Skip()
 
-    def generateSound(self, frequency=440, duration=1.0, sample_rate=44100, bits=16):
+    def generate_sound(self, frequency=440, duration=1.0, sample_rate=44000, bits=16):
         import math
         n_samples = int(round(duration * sample_rate))
 
@@ -139,15 +138,38 @@ class Oscillator(PluginBase):
         buf = np.zeros(n_samples, dtype=np.int16)
         max_sample = 2 ** (bits - 1) - 1
 
+        sine_multiplier = (float(self.knob3.GetValue()) / 50.0) + 0.1
         from scipy.fftpack import fft
         last_part_fade_start = sample_rate/100
         for s in range(n_samples):
             t = float(s) / sample_rate  # time in seconds
-            buf[s] = int(round(max_sample * math.sin(2 * math.pi * frequency * t) * (1 if s < (n_samples - last_part_fade_start) else ( (n_samples - s)/ last_part_fade_start))))
+            buf[s] = int(round(max_sample * math.sin(2 * math.pi * frequency * t * sine_multiplier) * (1 if s < (n_samples - last_part_fade_start) else ((n_samples - s) / last_part_fade_start))))
 
-        f = fft(buf)
+        self.add_noise(buf)
+        self.add_fading(buf)
 
         return buf
+
+    def add_fading(self, arr):
+        arrLen = float(len(arr))
+        a = (float(self.knob2.GetValue())/10)
+        for k, x in enumerate(arr):
+            arr[k] = float(x) * ((1/(arrLen**(2*a))) * (arrLen - float(k))**(2*a))
+
+    def add_noise(self, arr):
+        arrMin = min(arr)
+        arrMax = max(arr)
+        noiseValue = self.knob1.GetValue()
+
+        for k, x in enumerate(arr):
+            rand = ((100 - np.random.randint(noiseValue + 1))/100)
+            newValue = x + ((1 if np.random.randint(2) else -1) * (1 - rand) * arrMax)
+            if newValue < arrMin:
+                arr[k] = arrMin
+            elif newValue > arrMax:
+                arr[k] = arrMax
+            else:
+                arr[k] = newValue
 
     def get_color(self):
         return self.instrumentColorPicker.GetColour()
@@ -165,7 +187,7 @@ class Oscillator(PluginBase):
         self.knob3BeforeSave = self.knob3.GetValue()
 
     def get_serialization_data(self):
-        d = {'isSound': True,
+        return ('Oscillator', {'isSound': True,
              'knob1Value': self.knob1.GetValue(),
              'knob2Value': self.knob2.GetValue(),
              'knob3Value': self.knob3.GetValue(),
@@ -173,8 +195,7 @@ class Oscillator(PluginBase):
              'colourGreen': self.colourGreen,
              'colourBlue': self.colourBlue,
              'colourAlpha': self.colourAlpha,
-             'pluginName': self.instrumentNameTextCtrl.GetValue()}
-        return self.pluginName, d
+             'pluginName': self.instrumentNameTextCtrl.GetValue()})
 
     def on_save(self, event):
         self.instrumentsPanel.add_instrument(Oscillator, self.get_serialization_data()[1])
@@ -185,13 +206,13 @@ class Oscillator(PluginBase):
         self.knobtracker1.SetLabel("Value = " + str(value))
         self.knobtracker1.Refresh()
 
-    def OnAngleChanged2(self, event):
+    def on_angle_changed2(self, event):
 
         value = event.GetValue()
         self.knobtracker2.SetLabel("Value = " + str(value))
         self.knobtracker2.Refresh()
 
-    def OnAngleChanged3(self, event):
+    def on_angle_changed3(self, event):
 
         value = event.GetValue()
         self.knobtracker3.SetLabel("Value = " + str(value))

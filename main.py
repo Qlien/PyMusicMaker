@@ -13,19 +13,23 @@ class MDIFrame(wx.MDIParentFrame):
         menu.Append(5001, "Exit")
         menu.Append(5002, "Save")
         menu.Append(5003, "Load")
+        menu.Append(5004, "Save to wav")
         menubar = wx.MenuBar()
         menubar.Append(menu, "&File")
+        self.SetMenuBar(menubar)
 
         self.contentNotSaved = False
 
-        self.SetMenuBar(menubar)
+        self.play_menu = PlayMenu(self)
+        self.generate_windows()
+
         self.Bind(wx.EVT_MENU, self.on_exit, id=5001)
         self.Bind(wx.EVT_MENU, self.on_save, id=5002)
         self.Bind(wx.EVT_MENU, self.on_load, id=5003)
+        self.Bind(wx.EVT_MENU, self.save_to_wav, id=5004)
 
     def generate_windows(self):
 
-        self.play_menu = PlayMenu(self)
         self.pluginsPanel = generate_plugins_panel(self)
         self.instrumentsPanel = generate_instruments_panel(self)
         self.pluginsPanel.set_instruments_panel(self.instrumentsPanel)
@@ -35,9 +39,36 @@ class MDIFrame(wx.MDIParentFrame):
         self.play_menu.bind_stop_button(self.soundBoardPanel.on_stop)
 
     def destroy_windows(self):
+        self.play_menu.unbind_play_button(self.soundBoardPanel.on_play)
+        self.play_menu.unbind_stop_button(self.soundBoardPanel.on_stop)
         self.instrumentsPanel.Destroy()
+        self.instrumentsPanel = None
         self.pluginsPanel.Destroy()
+        self.pluginsPanel = None
         self.soundBoardPanel.Destroy()
+        self.soundBoardPanel = None
+
+    def save_to_wav(self, event):
+        with wx.FileDialog(self, "Save wav file", wildcard="wav files (*.wav)|*.wav",
+                           style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT) as fileDialog:
+
+            if fileDialog.ShowModal() == wx.ID_CANCEL:
+                return     # the user changed their mind
+
+            # save the current contents in the file
+            pathname = fileDialog.GetPath()
+            try:
+                import pygame, wave
+                with wave.open(pathname, 'w') as file:
+                    file.setframerate(44000)
+                    file.setnchannels(1)
+                    file.setsampwidth(2)
+                    sound = self.soundBoardPanel.generate_sound()
+                    snd = pygame.mixer.Sound(sound)
+                    file.writeframesraw(snd.get_raw())
+                    file.close()
+            except IOError:
+                wx.LogError("Cannot save current data in file '%s'." % pathname)
 
     def on_exit(self, evt):
         self.Close(True)
@@ -88,7 +119,16 @@ class MDIFrame(wx.MDIParentFrame):
         self.destroy_windows()
         self.pluginsPanel = generate_plugins_panel(self)
         self.instrumentsPanel = generate_instruments_panel(self)
-        for k, v in jsonData['instruments'].items():
+        for instrument in jsonData['instruments']:
+            self.instrumentsPanel.add_instrument(getattr(self.pluginsPanel.plugins['Plugins.' + instrument[0].lower()], instrument[0]), instrument[1])
+
+        self.pluginsPanel.set_instruments_panel(self.instrumentsPanel)
+        self.soundBoardPanel = generate_soundboard_panel(self, self.instrumentsPanel, self.play_menu)
+        for note in jsonData['notes']:
+            self.soundBoardPanel.add_note(note[1])
+
+        self.play_menu.bind_play_button(self.soundBoardPanel.on_play)
+        self.play_menu.bind_stop_button(self.soundBoardPanel.on_stop)
 
         pass
 
