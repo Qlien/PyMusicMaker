@@ -1,5 +1,5 @@
 # Created by Dmytro Konobrytskyi, 2013 (github.com/Akson/MoveMe)
-from Frames.MoveMe.Canvas.Objects.SimpleTextBoxNode import SimpleTextBoxNode
+from Frames.MoveMe.Canvas.Objects.simpleTextNote import SimpleTextNote
 
 
 class NodesFactory(object):
@@ -7,4 +7,4 @@ class NodesFactory(object):
         pass
 
     def CreateNodeFromDescription(self, **kwargs):
-        return SimpleTextBoxNode(**kwargs)
+        return SimpleTextNote(**kwargs)

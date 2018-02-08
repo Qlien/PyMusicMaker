@@ -5,7 +5,7 @@ def generate_instruments_panel(parent):
     win = wx.MDIChildFrame(parent, -1, "Instruments", size=(110, 600), pos=(136, 0),
                            style=wx.DEFAULT_FRAME_STYLE ^ wx.MINIMIZE_BOX ^ wx.MAXIMIZE_BOX)
     s = wx.BoxSizer(wx.VERTICAL)
-    instrumentsPanel = Instruments(win, parent)
+    instrumentsPanel = Instruments(win)
     s.Add(instrumentsPanel, 1, wx.EXPAND)
     win.SetSizer(s)
     win.SetSizeHints(110, 600, 1200, 1200)
@@ -14,8 +14,8 @@ def generate_instruments_panel(parent):
 
 
 class Instruments(wx.Panel):
-    def __init__(self, parent, frameParent):
-        self.frameParent = frameParent
+    def __init__(self, parent):
+        self.frameParent = None
         self.associationData = {}
         self.instruments = {}
         self.parent = parent
@@ -36,6 +36,9 @@ class Instruments(wx.Panel):
 
         self.listView.SetAutoLayout(True)
         self.create_menu()
+
+    def set_frame_parent(self, frame_parent):
+        self.frameParent = frame_parent
 
     def Destroy(self):
         try:

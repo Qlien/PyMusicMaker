@@ -3,7 +3,7 @@ from enum import Enum
 import wx
 
 
-class SimpleBoxNode():
+class SimpleNote():
 
     def __init__(self, **kwargs):
         tempColor = kwargs.get('color', wx.Colour('#00aaaa'))

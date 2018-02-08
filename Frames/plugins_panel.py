@@ -11,17 +11,15 @@ def generate_plugins_panel(parent):
     win = wx.MDIChildFrame(parent, -1, "Plugins", size=(110, 600), pos=(0, 0),
                            style=wx.DEFAULT_FRAME_STYLE ^ wx.MINIMIZE_BOX ^ wx.MAXIMIZE_BOX)
     s = wx.BoxSizer(wx.VERTICAL)
-    panel = PluginsPanel(win, parent)
+    panel = PluginsPanel(win)
     s.Add(panel, 1, wx.EXPAND)
     win.SetSizer(s)
-    win.SetSizeHints(110, 600, 1200, 1200)
-    win.Show(True)
     return panel
 
 
 class PluginsPanel(wx.Panel):
-    def __init__(self, parent, frameParent):
-        self.frameParent = frameParent
+    def __init__(self, parent):
+        self.frameParent = None
         self.associationData = {}
         wx.Panel.__init__(self, parent)
         self.parent = parent
@@ -42,6 +40,9 @@ class PluginsPanel(wx.Panel):
         self.generateList(size=(50, 50))
 
         self.listView.SetAutoLayout(True)
+
+    def set_frame_parent(self, frame_parent):
+        self.frameParent = frame_parent
 
     def Destroy(self):
         try:
