@@ -3,6 +3,8 @@ Simple daw like music maker made in Python.
 
 PyMusicMaker allows to make melodies by combining sounds made in various plugins, and then save them as real sounds.
 
+![app screen](https://i.imgur.com/AsFFYre.png)
+
 Main window consists of three key subwindows:
 
 Plugins window is list of included sound generators which depending on various parameters can make sounds. Each plugin to be recognized by PyMusicMaker has to be placed in plugins window and inherit from PluginBase class. Parent class make sure basic parameters and functions are delivered by the plugin. Parameters are name, color. Plugin has to provide generate_sound method which makes sounds based on given parameters. By clicking generate sound on plugins window, new "instrument is placed in instruments window. (by pressing spacebar in currently opened plugin sample sound is generated)
