@@ -18,6 +18,7 @@ class TextDropTarget(wx.TextDropTarget):
 
     def OnDropText(self, x, y, data):
         self._canvas.create_node_from_description_at_position(data, [x, y])
+        return 0
 
 
 class SoundBoard(wx.ScrolledWindow):

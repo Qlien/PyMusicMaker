@@ -118,6 +118,7 @@ class MainWindowFrame(wx.MDIParentFrame, WindowBase, SerializationBase):
                     self.generate_windows()
                     self.bind_events()
                     self.set_serialization_data(self.load_from_file(file))
+                    self.instrumentsPanel.update_instruments()
             except IOError:
                 wx.LogError("Cannot open file '%s'." % pathname)
 

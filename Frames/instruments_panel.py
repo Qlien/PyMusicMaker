@@ -61,6 +61,7 @@ class Instruments(wx.Panel):
                                        , 'Failed to add'
                                        , wx.OK | wx.CENTRE)
             msg_box.ShowModal()
+            return False
         instrumentInstance = instrument_class(self.frameParent, **parameters)
         instrumentInstance.show_window(False)
         self.instruments[instrumentInstance.pluginName] = instrumentInstance
@@ -109,13 +110,15 @@ class Instruments(wx.Panel):
 
     # when item starts to be dragged
     def OnDragInit(self, event):
-        item = event.GetItem()
-        text = item.GetText()
-        tdo = wx.TextDataObject(text)
-        tds = wx.DropSource(self.listView)
-        tds.SetData(tdo)
-        tds.DoDragDrop(True)
-
+        try:
+            item = event.GetItem()
+            text = item.GetText()
+            tdo = wx.TextDataObject(text)
+            tds = wx.DropSource(self.listView)
+            tds.SetData(tdo)
+            tds.DoDragDrop(True)
+        except:
+            pass
     # when double clicked
     def OnActivated(self, event):
         itemb = event.GetIndex()
