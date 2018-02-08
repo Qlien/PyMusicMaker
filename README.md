@@ -11,3 +11,6 @@ Instruments window allows to pick generated sounds, now called instruments and p
 
 Sounds window allows user to draw sounds and make more complex melodies. Sound parts san be dragged from instruments window by drag and drop functionality or just by pressing spacebar after selecting particular instrument and having active sounds window. Sounds can be moved and resized. By clicking left mouse button sound is placed on the grid. To erase sounds sound has to be clicked by right mouse button. Each column of sounds window represents sound note whoch is described by frequency which is then applied to sound generation function provided by plugin represented by instrument. Notes are visible on the left side of window.
 
+Sounds made in PyMusicMaker can be saved and loaded by selecting specified option in File menu button. Sounds can be saved as wav files.
+
+bits per minute (field present by the play and pause buttons) can be modified changing tempo of the sound.
