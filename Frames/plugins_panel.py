@@ -25,21 +25,27 @@ class PluginsPanel(wx.Panel):
         self.parent = parent
 
         self.instrumentsText = wx.StaticText(self, -1, "Instruments")
+        self.filtersText = wx.StaticText(self, -1, "Filters")
         # listView initialization
-        self.listView = wx.ListView(self, -1,
-                                    style=wx.TR_DEFAULT_STYLE + wx.TR_HIDE_ROOT + wx.TR_HAS_VARIABLE_ROW_HEIGHT)
+        self.instruments_list = wx.ListView(self, -1,
+                                            style=wx.TR_DEFAULT_STYLE + wx.TR_HIDE_ROOT + wx.TR_HAS_VARIABLE_ROW_HEIGHT)
+
+        self.filters_list = wx.ListView(self, -1,
+                                            style=wx.TR_DEFAULT_STYLE + wx.TR_HIDE_ROOT + wx.TR_HAS_VARIABLE_ROW_HEIGHT)
         s = wx.BoxSizer(wx.VERTICAL)
         s.Add(self.instrumentsText, 0, wx.EXPAND)
-        s.Add(self.listView, 1, wx.EXPAND)
+        s.Add(self.instruments_list, 1, wx.EXPAND)
+        s.Add(self.filtersText, 0, wx.EXPAND)
+        s.Add(self.filters_list, 1, wx.EXPAND)
         self.SetSizer(s)
 
-        self.listView.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnActivated)
+        self.instruments_list.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnActivated)
 
         self.plugins = self.searchForPlugins()
 
         self.generateList(size=(50, 50))
 
-        self.listView.SetAutoLayout(True)
+        self.instruments_list.SetAutoLayout(True)
 
     def set_frame_parent(self, frame_parent):
         self.frameParent = frame_parent
@@ -61,7 +67,7 @@ class PluginsPanel(wx.Panel):
         info.m_image = -1
         info.m_format = 0
         info.m_text = "Generators"
-        self.listView.InsertColumn(0, info)
+        self.instruments_list.InsertColumn(0, info)
 
         image_list = wx.ImageList(*size)
 
@@ -71,22 +77,22 @@ class PluginsPanel(wx.Panel):
             image = image_list.Add(
                 classWrapper.icon.ConvertToImage().Rescale(*size).ConvertToBitmap())
             if classWrapper.pluginType == PluginType.SOUNDGENERATOR:
-                item = self.listView.InsertItem(key,
-                                                (name[name.find('.') + 1:]),
-                                                image)
-                self.listView.SetItemData(item, key)
-                self.listView.SetItemImage(item, image, wx.TreeItemIcon_Normal)
+                item = self.instruments_list.InsertItem(key,
+                                                        (name[name.find('.') + 1:]),
+                                                        image)
+                self.instruments_list.SetItemData(item, key)
+                self.instruments_list.SetItemImage(item, image, wx.TreeItemIcon_Normal)
 
             if classWrapper.pluginType == PluginType.FILTER:
                 pass
 
-        self.listView.AssignImageList(image_list, wx.IMAGE_LIST_SMALL)
+        self.instruments_list.AssignImageList(image_list, wx.IMAGE_LIST_SMALL)
         self.Layout()
 
     # when double clicked
     def OnActivated(self, event):
         itemb = event.GetIndex()
-        item = self.listView.GetItemData(itemb)
+        item = self.instruments_list.GetItemData(itemb)
         classInstance = self.associationData[item](self.frameParent)
         classInstance.set_instruments_panel_window(self.instrumentsPanel)
 

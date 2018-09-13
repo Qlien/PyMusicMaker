@@ -7,21 +7,17 @@ import pygame
 from Frames.MoveMe.Canvas.nodesFactory import NodesFactory
 from Frames.MoveMe.Canvas.Objects.simpleTextNote import SimpleTextNote
 from Frames.MoveMe.Canvas.soundBoardBG import *
-
-BUFFERED = 0
-
-
-class TextDropTarget(wx.TextDropTarget):
-    def __init__(self, canvas):
-        wx.TextDropTarget.__init__(self)
-        self._canvas = canvas
-
-    def OnDropText(self, x, y, data):
-        self._canvas.create_node_from_description_at_position(data, [x, y])
-        return 0
+from Frames.MoveMe.Canvas.soundBoardSubWindow import TextDropTarget
 
 
-class SoundBoard(wx.ScrolledWindow):
+def generate_filters_panel(parent):
+    s = wx.BoxSizer(wx.VERTICAL)
+    soundBoardPanel = FiltersSubWindow(parent)
+    s.Add(soundBoardPanel)
+    return soundBoardPanel
+
+
+class FiltersSubWindow(wx.ScrolledWindow):
     def __init__(self, parent, id=-1, size=wx.DefaultSize, **kw):
         wx.ScrolledWindow.__init__(self, parent, id, (0, 0), size=size, style=wx.SUNKEN_BORDER)
         self.play_menu = None
@@ -85,112 +81,6 @@ class SoundBoard(wx.ScrolledWindow):
         self.horizontalInterval = 40
         self.verticalInterval = 20
 
-    def set_instruments_panel(self, instruments_panel):
-        self.instrumentsPanel = instruments_panel
-
-    def set_play_menu(self, play_menu):
-        self.play_menu = play_menu
-
-    def Destroy(self):
-        try:
-            super(wx.ScrolledWindow, self).Destroy()
-            self.parent.Destroy()
-        except:
-            print('already deleted')
-
-    def add_note(self, params):
-        self._canvasObjects.append(SimpleTextNote(**params))
-
-    def get_serialization_data(self):
-        return [noteData.get_serialization_data() for noteData in self._canvasObjects]
-
-    def on_play(self, event):
-        self.on_stop(None)
-        self.songPlayThread = threading.Thread(target=self.play_song)
-        self.songPlayThread.start()
-
-    def on_stop(self, event):
-        pygame.mixer.quit()
-        if self.soundPlaying:
-            self.soundPlaying = False
-
-    def play_song(self):
-        if self.soundPlaying:
-            return
-        self.soundPlaying = True
-        pygame.mixer.quit()
-        pygame.mixer.pre_init(44100, -16, 1, 512)
-        pygame.mixer.init(44100, -16, 1, 512)
-
-        sound = pygame.sndarray.make_sound(np.array(self.generate_sound()))
-        # play once, then loop forever
-        sound.play()
-
-    def generate_sound(self):
-        small_parts = self._soundBoardBG.columnsInSubPart * self._soundBoardBG.subParts * self._soundBoardBG.parts
-        x_distance = self._soundBoardBG.columnWidth + self._soundBoardBG.columnSpacing
-        y_distance = self._soundBoardBG.rowHeight + self._soundBoardBG.rowSpacing
-        x_beginning = self._soundBoardBG.xBegin
-        y_beginning = self._soundBoardBG.yBegin
-
-        # setup our numpy array to handle 16 bit ints, which is what we set our mixer to expect with "bits" up above
-        wholeSound = np.zeros(int(44000 * small_parts * 15 / float(self.play_menu.bpm.GetValue())), dtype=np.int16)
-        smallestPartArraySize = int(round(44000 * 15 / self.play_menu.bpm.GetValue()))
-        partsDivisions = np.zeros(small_parts)
-        for i in range(small_parts):
-            notes_in_place = [sound for sound in self._canvasObjects if
-                              sound.position[0] == (x_beginning + x_distance * i)]
-            for note in notes_in_place:
-
-                frequency_n = int((note.position[1] - y_beginning) / y_distance)
-                frequency = self._soundBoardBG.notes[frequency_n].frequency
-                instrument = self.instrumentsPanel.instruments[note.text]
-                note_duration = note.boundingBoxDimensions[0] / x_distance * (
-                        60 / float(self.play_menu.bpm.GetValue())) * (1 / 4)
-                sound = instrument.generate_sound(frequency=frequency, duration=note_duration, sample_rate=44100,
-                                                  bits=16)
-                wholeSound[(i * smallestPartArraySize):(i * smallestPartArraySize) + len(sound)] \
-                    = np.add(wholeSound[(i * smallestPartArraySize):(i * smallestPartArraySize) + len(sound)], sound)
-
-                for j in range(int(note.boundingBoxDimensions[0] / x_distance)):
-                    partsDivisions[j + i] += 1
-
-        partsDivisions = np.trim_zeros(partsDivisions)
-        wholeSound = np.trim_zeros(wholeSound)
-
-        # for k, v in enumerate(partsDivisions):
-        #     if v > 1:
-        #         for j in range(smallestPartArraySize):
-        #             wholeSound[j + k * smallestPartArraySize] /= v
-
-        return wholeSound
-
-    def on_char(self, event):
-        if event.GetUnicodeKey() == wx.WXK_SPACE:
-            tempInstrument = self.instrumentsPanel.get_selected_instrument()
-            if tempInstrument:
-                dim = self._canvasObjects[-1].boundingBoxDimensions if self._canvasObjects else [31, 22]
-                self.instrumentToDraw = \
-                    SimpleTextNote(position=self.sound_rounded_pos(self.lastMousePos)
-                                   , text=tempInstrument.pluginName, boundingBoxDimensions=dim
-                                   , color=tempInstrument.get_color())
-
-        if event.GetKeyCode() == wx.WXK_DELETE:
-            if self._selectedObject and self._selectedObject.deletable:
-                self._selectedObject.Delete()
-                if self._selectedObject in self._canvasObjects:
-                    self._canvasObjects.remove(self._selectedObject)
-                self._selectedObject = None
-        else:
-            event.Skip()
-
-        # Update object under cursor
-        pos = self.CalcUnscrolledPosition(event.GetPosition()).Get()
-        self._objectUnderCursor = self.find_object_under_point(pos)
-
-        self.render()
-        event.Skip()
-
     def on_paint(self, event):
         dc = wx.BufferedPaintDC(self, self.buffer, wx.BUFFER_VIRTUAL_AREA)
         dc.Clear()
@@ -247,37 +137,6 @@ class SoundBoard(wx.ScrolledWindow):
             if pos1Copy[0] > 200:
                 pos1Copy = pos1
                 pos2Copy = pos2
-
-    def render(self):
-        cdc = wx.ClientDC(self)
-        self.PrepareDC(cdc)
-        gc = wx.BufferedDC(cdc, self.buffer, wx.BUFFER_VIRTUAL_AREA)
-        gc.Clear()
-
-        gc.SetBrush(wx.Brush('#00aaaa', wx.SOLID))
-        gc.SetPen(wx.Pen('#00aaaa', 1, wx.SOLID))
-        self._soundBoardBG.render(gc)
-
-        for obj in self._canvasObjects:
-            obj.render(gc)
-
-        if self.instrumentToDraw:
-            self.instrumentToDraw.render(gc)
-
-        if self._selectedObject:
-            self._selectedObject.render_selection(gc)
-
-        if (self._objectUnderCursor or self._draggingObject) and not self._resizingObject:
-            if self._objectUnderCursor:
-                self._objectUnderCursor.render_highlighting(gc)
-            else:
-                self._draggingObject.render_highlighting(gc)
-
-        if (self._objectUnderResizingGrippers or self._resizingObject) and not self._draggingObject:
-            if self._objectUnderResizingGrippers:
-                self._objectUnderResizingGrippers.render_resizing(gc)
-            else:
-                self._resizingObject.render_resizing(gc)
 
     def on_mouse_motion(self, evt):
         self.lastMousePos = self.CalcUnscrolledPosition(evt.GetPosition()).Get()
@@ -348,6 +207,37 @@ class SoundBoard(wx.ScrolledWindow):
         self.render()
         self._lastDraggingPosition = [min(self.lastMousePos[0], self.canvasDimensions[0]),
                                       min(self.lastMousePos[1], self.canvasDimensions[1])]
+
+    def render(self):
+        cdc = wx.ClientDC(self)
+        self.PrepareDC(cdc)
+        gc = wx.BufferedDC(cdc, self.buffer, wx.BUFFER_VIRTUAL_AREA)
+        gc.Clear()
+
+        gc.SetBrush(wx.Brush('#00aaaa', wx.SOLID))
+        gc.SetPen(wx.Pen('#00aaaa', 1, wx.SOLID))
+        self._soundBoardBG.render(gc)
+
+        for obj in self._canvasObjects:
+            obj.render(gc)
+
+        if self.instrumentToDraw:
+            self.instrumentToDraw.render(gc)
+
+        if self._selectedObject:
+            self._selectedObject.render_selection(gc)
+
+        if (self._objectUnderCursor or self._draggingObject) and not self._resizingObject:
+            if self._objectUnderCursor:
+                self._objectUnderCursor.render_highlighting(gc)
+            else:
+                self._draggingObject.render_highlighting(gc)
+
+        if (self._objectUnderResizingGrippers or self._resizingObject) and not self._draggingObject:
+            if self._objectUnderResizingGrippers:
+                self._objectUnderResizingGrippers.render_resizing(gc)
+            else:
+                self._resizingObject.render_resizing(gc)
 
     def on_mouse_left_down(self, evt):
         if self.instrumentToDraw:
@@ -436,7 +326,3 @@ class SoundBoard(wx.ScrolledWindow):
         if obj in self._canvasObjects:
             self._canvasObjects.remove(obj)
             self._canvasObjects.append(obj)
-
-
-def roundup(x, y):
-    return int(math.ceil(x / y)) * y
