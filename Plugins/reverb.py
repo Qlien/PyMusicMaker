@@ -6,7 +6,7 @@ import wx
 import wx.lib.agw.knobctrl as KC
 
 from Plugins.Oscillator.oscSound import OscillatorSound
-from plugin import PluginBase, PluginType
+from bin.plugin import PluginBase, PluginType
 
 
 class Reverb(PluginBase):

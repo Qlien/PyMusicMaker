@@ -3,7 +3,7 @@ import wx
 
 def generate_instruments_panel(parent):
     win = wx.MDIChildFrame(parent, -1, "Instruments", size=(110, 600), pos=(136, 0),
-                           style=wx.DEFAULT_FRAME_STYLE ^ wx.MINIMIZE_BOX ^ wx.MAXIMIZE_BOX)
+                           style=wx.CLOSE_BOX | wx.CAPTION | wx.CLIP_CHILDREN | wx.RESIZE_BORDER)
     s = wx.BoxSizer(wx.VERTICAL)
     instrumentsPanel = Instruments(win)
     s.Add(instrumentsPanel, 1, wx.EXPAND)
@@ -22,7 +22,7 @@ class Instruments(wx.Panel):
         wx.Panel.__init__(self, parent)
         # listView initialization
         self.listView = wx.ListView(self, -1,
-                                    style=wx.TR_DEFAULT_STYLE + wx.TR_HIDE_ROOT + wx.TR_HAS_VARIABLE_ROW_HEIGHT)
+                                    style=wx.TR_DEFAULT_STYLE | wx.TR_HIDE_ROOT | wx.TR_HAS_VARIABLE_ROW_HEIGHT)
         s = wx.BoxSizer(wx.VERTICAL)
         s.Add(self.listView, 1, wx.EXPAND)
         self.SetSizer(s)

@@ -1,5 +1,8 @@
 import numpy as np
 
+from bin.lookupTables import Lookups
+
+
 class OscillatorSound:
     def __init__(self):
         self.noiseParameter = 0
@@ -15,24 +18,16 @@ class OscillatorSound:
     def update_damping_parameter(self, noise):
         self.dampingParameter = noise
 
-    def generate_sound(self, frequency=440, duration=1.0, sample_rate=44000, bits=16):
-        import math
+    def sound_generator(self, frequency=440, duration=1.0, sample_rate=44000, bits=16, framesInterval=1024, bpm=128):
         n_samples = int(round(duration * sample_rate))
 
-        buf = np.zeros(n_samples, dtype=np.int16)
-        max_sample = 2 ** (bits - 1) - 1
-
-        sine_multiplier = (float(self.dampingParameter) / 50.0) + 0.1
-        last_part_fade_start = sample_rate / 100
-        for s in range(n_samples):
-            t = float(s) / sample_rate  # time in seconds
-            buf[s] = int(round(max_sample * math.sin(2 * math.pi * frequency * t * sine_multiplier) * (
-            1 if s < (n_samples - last_part_fade_start) else ((n_samples - s) / last_part_fade_start))))
-
-        buf = self.add_noise(buf)
-        buf = self.add_fading(buf)
-
-        return buf
+        current_interval_index = 0
+        while current_interval_index < n_samples:
+            simpleSine = Lookups.sineValues()[int(((current_interval_index * frequency / sample_rate) % 1)
+                                                 * len(Lookups.sineValues()))]
+            yield simpleSine
+            current_interval_index += 1
+        pass
 
     def add_fading(self, arr):
         arrLen = float(len(arr))

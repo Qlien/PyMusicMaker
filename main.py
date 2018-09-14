@@ -1,5 +1,5 @@
-from frame import MainWindowFrame
-from toolbarHelper import *
+from bin.frame import MainWindowFrame
+from bin.toolbarHelper import *
 
 
 class App(object):

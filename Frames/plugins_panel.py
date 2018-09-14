@@ -5,12 +5,12 @@ import wx
 from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
 
 import Plugins
-from plugin import PluginType
+from bin.plugin import PluginType
 
 
 def generate_plugins_panel(parent):
     win = wx.MDIChildFrame(parent, -1, "Plugins", size=(110, 600), pos=(0, 0),
-                           style=wx.DEFAULT_FRAME_STYLE ^ wx.MINIMIZE_BOX ^ wx.MAXIMIZE_BOX)
+                           style=wx.CLOSE_BOX | wx.CAPTION | wx.CLIP_CHILDREN | wx.RESIZE_BORDER)
     s = wx.BoxSizer(wx.VERTICAL)
     panel = PluginsPanel(win)
     s.Add(panel, 1, wx.EXPAND)

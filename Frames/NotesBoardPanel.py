@@ -1,13 +1,6 @@
 import math
-import threading
 
-import numpy as np
-import pygame
-
-from Frames.MoveMe.Canvas.nodesFactory import NodesFactory
-from Frames.MoveMe.Canvas.Objects.simpleTextNote import SimpleTextNote
 from Frames.MoveMe.Canvas.soundBoardBG import *
-from plugin import PluginType
 
 
 def generate_left_notes_panel(parent, boardType):

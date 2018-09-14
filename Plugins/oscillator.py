@@ -6,7 +6,7 @@ import wx
 import wx.lib.agw.knobctrl as KC
 
 from Plugins.Oscillator.oscSound import OscillatorSound
-from plugin import PluginBase, PluginType
+from bin.plugin import PluginBase, PluginType
 
 
 class Oscillator(PluginBase):
@@ -139,11 +139,12 @@ class Oscillator(PluginBase):
 
         event.Skip()
 
-    def generate_sound(self, frequency=440, duration=1.0, sample_rate=44000, bits=16):
+    def generate_sound(self, frequency=440, duration=1.0, sample_rate=44000, bits=16, framesInterval=1024, bpm=128):
         self.oscSound.update_damping_parameter(self.knob3.GetValue())
         self.oscSound.update_fading_parameter(self.knob2.GetValue())
         self.oscSound.update_noise_parameter(self.knob1.GetValue())
-        return self.oscSound.generate_sound(frequency=frequency, duration=duration, sample_rate=sample_rate, bits=bits)
+        return self.oscSound.sound_generator(frequency=frequency, duration=duration, sample_rate=sample_rate, bits=bits
+                                             , framesInterval=1024, bpm=128)
 
     def get_color(self):
         return self.instrumentColorPicker.GetColour()

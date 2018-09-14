@@ -2,19 +2,20 @@ import wx
 
 from Frames.MoveMe.Canvas.soundBoardSubWindow import SoundBoardSubWindow
 from Frames.NotesBoardPanel import generate_left_notes_panel
-from plugin import PluginType
+from bin.plugin import PluginType
+from bin.soundGeneration import SoundGenerator
 
 
-def generate_soundboard_panel(parent, boardType):
+def generate_soundboard_panel(parent, boardType, soundGenerator):
     s = wx.BoxSizer(wx.VERTICAL)
-    soundBoardPanel = SoundBoardSubWindow(parent, boardType)
+    soundBoardPanel = SoundBoardSubWindow(parent, boardType, soundGenerator)
     s.Add(soundBoardPanel)
     return soundBoardPanel
 
 
 def generate_soundboard_wrapper(parent):
     win = wx.MDIChildFrame(parent, -1, "Sounds", size=(1100, 600), pos=(272, 0),
-                           style=wx.DEFAULT_FRAME_STYLE ^ wx.MINIMIZE_BOX ^ wx.MAXIMIZE_BOX)
+                           style=wx.CLOSE_BOX | wx.CAPTION | wx.CLIP_CHILDREN | wx.RESIZE_BORDER)
     s = wx.BoxSizer(wx.VERTICAL)
     sound_board_panel = SoundBoardWrapper(win)
     s.Add(sound_board_panel)
@@ -30,14 +31,17 @@ class SoundBoardWrapper(wx.Panel):
         wx.Panel.__init__(self, parent)
         self.parent = parent
 
+        self.soundGenerator = SoundGenerator()
+
         self.soundBoardText = wx.StaticText(self, -1, "Notes")
         self.filtersText = wx.StaticText(self, -1, "Filters")
-        self.soundboard_panel = generate_soundboard_panel(self, PluginType.SOUNDGENERATOR)
+        self.soundboard_panel = generate_soundboard_panel(self, PluginType.SOUNDGENERATOR, self.soundGenerator)
         self.soundboard_notes_panel = generate_left_notes_panel(self, PluginType.SOUNDGENERATOR)
-        self.filters_panel = generate_soundboard_panel(self, PluginType.FILTER)
+        self.filters_panel = generate_soundboard_panel(self, PluginType.FILTER, self.soundGenerator)
         self.soundboard_filters_notes_panel = generate_left_notes_panel(self, PluginType.FILTER)
 
         self.Bind(wx.EVT_CHAR_HOOK, self.on_char)
+        self.Bind(wx.EVT_CLOSE, self.OnClose)
         notes_sizer_wrapper = wx.BoxSizer(wx.HORIZONTAL)
         filters_sizer_wrapper = wx.BoxSizer(wx.HORIZONTAL)
 
@@ -59,3 +63,6 @@ class SoundBoardWrapper(wx.Panel):
         self.soundboard_panel.on_char(event)
         self.filters_panel.on_char(event)
         event.Skip()
+
+    def OnClose(self, evt):
+        evt.Veto()

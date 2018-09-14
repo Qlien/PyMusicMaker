@@ -3,9 +3,10 @@ import json
 from Frames.instruments_panel import *
 from Frames.plugins_panel import *
 from Frames.soundboard_panel import *
-from serialization import SerializationBase
-from toolbarHelper import *
-from window import WindowBase
+from bin.lookupTables import Lookups
+from bin.serialization import SerializationBase
+from bin.toolbarHelper import *
+from bin.window import WindowBase
 
 
 class MainWindowFrame(wx.MDIParentFrame, WindowBase, SerializationBase):
@@ -14,6 +15,7 @@ class MainWindowFrame(wx.MDIParentFrame, WindowBase, SerializationBase):
     def __init__(self, parent=None, id=None, title=None, size=None):
         wx.MDIParentFrame.__init__(self, parent=parent, id=id, title=title, size=size)
 
+        Lookups.initializeLookups()
         self.pluginsPanel = None
         self.instrumentsPanel = None
         self.sound_board_tuple = None

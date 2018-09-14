@@ -7,7 +7,8 @@ import pygame
 from Frames.MoveMe.Canvas.nodesFactory import NodesFactory
 from Frames.MoveMe.Canvas.Objects.simpleTextNote import SimpleTextNote
 from Frames.MoveMe.Canvas.soundBoardBG import *
-from plugin import PluginType
+from bin.plugin import PluginType
+from bin.soundGeneration import SoundPanelElement
 
 BUFFERED = 0
 
@@ -23,7 +24,7 @@ class TextDropTarget(wx.TextDropTarget):
 
 
 class SoundBoardSubWindow(wx.ScrolledWindow):
-    def __init__(self, parent, windowType, id=-1, size=wx.DefaultSize, **kw):
+    def __init__(self, parent, windowType, soundGenerator, id=-1, size=wx.DefaultSize, **kw):
         wx.ScrolledWindow.__init__(self, parent, id, (0, 0), size=size, style=wx.SUNKEN_BORDER)
         self.play_menu = None
         self._objectUnderCursor = None
@@ -37,12 +38,11 @@ class SoundBoardSubWindow(wx.ScrolledWindow):
         self._elementResizePosition = None
         self._firstTimeRender = True
         self.instrumentToDraw = None
-        self.songPlayThread = None
-        self.soundPlaying = False
         self.lastMousePos = [0, 0]
         self.instrumentsPanel = None
         self.neighbouring_vertical_view = None
         self.neighbouring_horizontal_view = None
+        self.soundGenerator = soundGenerator
         self.windowType = windowType
         self.SetMinSize((100, 110))
 
@@ -94,10 +94,10 @@ class SoundBoardSubWindow(wx.ScrolledWindow):
         virtual_size = self.GetViewStart()
         if self.neighbouring_vertical_view is not None:
             self.neighbouring_vertical_view.Scroll(virtual_size[0]
-                                               , self.neighbouring_vertical_view.GetViewStart()[1])
+                                                   , self.neighbouring_vertical_view.GetViewStart()[1])
         if self.neighbouring_horizontal_view is not None:
             self.neighbouring_horizontal_view.Scroll(self.neighbouring_horizontal_view.GetViewStart()[0]
-                                               , virtual_size[1])
+                                                     , virtual_size[1])
         evt.Skip()
         pass
 
@@ -126,21 +126,20 @@ class SoundBoardSubWindow(wx.ScrolledWindow):
         self.songPlayThread.start()
 
     def on_stop(self, event):
-        pygame.mixer.quit()
-        if self.soundPlaying:
-            self.soundPlaying = False
+        if self.soundGenerator.soundPlaying:
+            self.soundGenerator.soundPlaying = False
 
     def play_song(self):
-        if self.soundPlaying:
+        if self.soundGenerator.soundPlaying:
             return
-        self.soundPlaying = True
-        pygame.mixer.quit()
-        pygame.mixer.pre_init(44100, -16, 1, 512)
-        pygame.mixer.init(44100, -16, 1, 512)
 
-        sound = pygame.sndarray.make_sound(np.array(self.generate_sound()))
-        # play once, then loop forever
-        sound.play()
+        if self.windowType == PluginType.SOUNDGENERATOR:
+            self.soundGenerator.update_sounds(self.generate_sound())
+        if self.windowType == PluginType.SOUNDGENERATOR:
+            self.soundGenerator.update_filters(self.generate_sound())
+
+        self.soundGenerator.set_BPM(self.play_menu.bpm.GetValue())
+        self.soundGenerator.play_song()
 
     def generate_sound(self):
         small_parts = self._soundBoardBG.columnsInSubPart * self._soundBoardBG.subParts * self._soundBoardBG.parts
@@ -149,37 +148,23 @@ class SoundBoardSubWindow(wx.ScrolledWindow):
         x_beginning = self._soundBoardBG.xBegin
         y_beginning = self._soundBoardBG.yBegin
 
-        # setup our numpy array to handle 16 bit ints, which is what we set our mixer to expect with "bits" up above
-        wholeSound = np.zeros(int(44000 * small_parts * 15 / float(self.play_menu.bpm.GetValue())), dtype=np.int16)
-        smallestPartArraySize = int(round(44000 * 15 / self.play_menu.bpm.GetValue()))
-        partsDivisions = np.zeros(small_parts)
+        instruments_dict = dict()
+
         for i in range(small_parts):
+
             notes_in_place = [sound for sound in self._canvasObjects if
                               sound.position[0] == (x_beginning + x_distance * i)]
             for note in notes_in_place:
+                soundElement = SoundPanelElement(self.instrumentsPanel.instruments[note.text]
+                                                 , self.windowType
+                                                 , note.boundingBoxDimensions[0] / x_distance
+                                                 , int((note.position[1] - y_beginning) / y_distance))
+                if i not in instruments_dict:
+                    instruments_dict[i] = [soundElement]
+                else:
+                    instruments_dict[i].append(soundElement)
 
-                frequency_n = int((note.position[1] - y_beginning) / y_distance)
-                frequency = self._soundBoardBG.notes[frequency_n].frequency
-                instrument = self.instrumentsPanel.instruments[note.text]
-                note_duration = note.boundingBoxDimensions[0] / x_distance * (
-                        60 / float(self.play_menu.bpm.GetValue())) * (1 / 4)
-                sound = instrument.generate_sound(frequency=frequency, duration=note_duration, sample_rate=44100,
-                                                  bits=16)
-                wholeSound[(i * smallestPartArraySize):(i * smallestPartArraySize) + len(sound)] \
-                    = np.add(wholeSound[(i * smallestPartArraySize):(i * smallestPartArraySize) + len(sound)], sound)
-
-                for j in range(int(note.boundingBoxDimensions[0] / x_distance)):
-                    partsDivisions[j + i] += 1
-
-        partsDivisions = np.trim_zeros(partsDivisions)
-        wholeSound = np.trim_zeros(wholeSound)
-
-        # for k, v in enumerate(partsDivisions):
-        #     if v > 1:
-        #         for j in range(smallestPartArraySize):
-        #             wholeSound[j + k * smallestPartArraySize] /= v
-
-        return wholeSound
+        return instruments_dict
 
     def on_char(self, event):
         var = self.GetViewStart()
