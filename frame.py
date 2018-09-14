@@ -18,6 +18,7 @@ class MainWindowFrame(wx.MDIParentFrame, WindowBase, SerializationBase):
         self.instrumentsPanel = None
         self.sound_board_tuple = None
         self.sound_board_panel = None
+        self.sound_board_filters = None
         self.play_menu = PlayMenu(self)
 
         self.generate_layout()
@@ -81,6 +82,8 @@ class MainWindowFrame(wx.MDIParentFrame, WindowBase, SerializationBase):
         self.sound_board_panel = self.sound_board_tuple[1]
         self.sound_board_panel.set_instruments_panel(self.instrumentsPanel)
         self.sound_board_panel.set_play_menu(self.play_menu)
+        self.sound_board_filters = self.sound_board_tuple[2]
+        self.sound_board_filters.set_instruments_panel(self.instrumentsPanel)
 
     def destroy_windows(self):
         """destroys windows inside main frame window"""
@@ -91,10 +94,12 @@ class MainWindowFrame(wx.MDIParentFrame, WindowBase, SerializationBase):
         self.instrumentsPanel = None
         self.pluginsPanel.Destroy()
         self.pluginsPanel = None
-        self.sound_board_tuple.Destroy()
-        self.sound_board_tuple = None
+        self.sound_board_filters.Destroy()
+        self.sound_board_filters = None
         self.sound_board_panel.Destroy()
         self.sound_board_panel = None
+        self.sound_board_tuple.Destroy()
+        self.sound_board_tuple = None
 
     def on_exit(self):
         self.unbind_events()

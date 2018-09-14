@@ -2,6 +2,7 @@ import importlib
 import pkgutil
 
 import wx
+from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin
 
 import Plugins
 from plugin import PluginType
@@ -16,6 +17,12 @@ def generate_plugins_panel(parent):
     win.SetSizer(s)
     return panel
 
+class CheckListCtrl(wx.ListCtrl, ListCtrlAutoWidthMixin):
+
+    def __init__(self, parent):
+        wx.ListCtrl.__init__(self, parent, wx.ID_ANY, style=wx.LC_REPORT |
+                wx.SUNKEN_BORDER | wx.LC_NO_HEADER)
+        ListCtrlAutoWidthMixin.__init__(self)
 
 class PluginsPanel(wx.Panel):
     def __init__(self, parent):
@@ -27,11 +34,9 @@ class PluginsPanel(wx.Panel):
         self.instrumentsText = wx.StaticText(self, -1, "Instruments")
         self.filtersText = wx.StaticText(self, -1, "Filters")
         # listView initialization
-        self.instruments_list = wx.ListView(self, -1,
-                                            style=wx.TR_DEFAULT_STYLE + wx.TR_HIDE_ROOT + wx.TR_HAS_VARIABLE_ROW_HEIGHT)
+        self.instruments_list = CheckListCtrl(self)
 
-        self.filters_list = wx.ListView(self, -1,
-                                            style=wx.TR_DEFAULT_STYLE + wx.TR_HIDE_ROOT + wx.TR_HAS_VARIABLE_ROW_HEIGHT)
+        self.filters_list = CheckListCtrl(self)
         s = wx.BoxSizer(wx.VERTICAL)
         s.Add(self.instrumentsText, 0, wx.EXPAND)
         s.Add(self.instruments_list, 1, wx.EXPAND)
@@ -46,6 +51,7 @@ class PluginsPanel(wx.Panel):
         self.generateList(size=(50, 50))
 
         self.instruments_list.SetAutoLayout(True)
+        self.Refresh()
 
     def set_frame_parent(self, frame_parent):
         self.frameParent = frame_parent
@@ -64,10 +70,16 @@ class PluginsPanel(wx.Panel):
 
         info = wx.ListItem()
         info.m_mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
-        info.m_image = -1
+        info.m_image = 1
         info.m_format = 0
         info.m_text = "Generators"
         self.instruments_list.InsertColumn(0, info)
+        info = wx.ListItem()
+        info.m_mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+        info.m_image = 1
+        info.m_format = 0
+        info.m_text = "Filters"
+        self.filters_list.InsertColumn(0, info)
 
         image_list = wx.ImageList(*size)
 
@@ -84,9 +96,14 @@ class PluginsPanel(wx.Panel):
                 self.instruments_list.SetItemImage(item, image, wx.TreeItemIcon_Normal)
 
             if classWrapper.pluginType == PluginType.FILTER:
-                pass
+                item = self.filters_list.InsertItem(key,
+                                                        (name[name.find('.') + 1:]),
+                                                        image)
+                self.filters_list.SetItemData(item, key)
+                self.filters_list.SetItemImage(item, image, wx.TreeItemIcon_Normal)
 
         self.instruments_list.AssignImageList(image_list, wx.IMAGE_LIST_SMALL)
+        self.filters_list.AssignImageList(image_list, wx.IMAGE_LIST_SMALL)
         self.Layout()
 
     # when double clicked

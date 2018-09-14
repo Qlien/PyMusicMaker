@@ -22,7 +22,7 @@ class TextDropTarget(wx.TextDropTarget):
 
 
 class SoundBoardSubWindow(wx.ScrolledWindow):
-    def __init__(self, parent, id=-1, size=wx.DefaultSize, **kw):
+    def __init__(self, parent, windowType, id=-1, size=wx.DefaultSize, **kw):
         wx.ScrolledWindow.__init__(self, parent, id, (0, 0), size=size, style=wx.SUNKEN_BORDER)
         self.play_menu = None
         self._objectUnderCursor = None
@@ -40,11 +40,13 @@ class SoundBoardSubWindow(wx.ScrolledWindow):
         self.soundPlaying = False
         self.lastMousePos = [0, 0]
         self.instrumentsPanel = None
+        self.windowType = windowType
+        self.SetMinSize((100, 110))
 
         self.parent = parent
 
         self.scrollStep = kw.get("scrollStep", 30)
-        self._soundBoardBG = SoundBoardBG(parts=20)
+        self._soundBoardBG = SoundBoardBG(parts=20, boardType=windowType)
         self.canvasDimensions = kw.get("canvasDimensions"
                                        , [1 + self._soundBoardBG.xBegin +
                                           (self._soundBoardBG.parts *

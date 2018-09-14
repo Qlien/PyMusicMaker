@@ -4,9 +4,9 @@ from Frames.MoveMe.Canvas.soundBoardSubWindow import SoundBoardSubWindow
 from Frames.filters_panel import generate_filters_panel
 
 
-def generate_soundboard_panel(parent):
+def generate_soundboard_panel(parent, boardType):
     s = wx.BoxSizer(wx.VERTICAL)
-    soundBoardPanel = SoundBoardSubWindow(parent)
+    soundBoardPanel = SoundBoardSubWindow(parent, boardType)
     s.Add(soundBoardPanel)
     return soundBoardPanel
 
@@ -23,23 +23,20 @@ def generate_soundboard_wrapper(parent):
 
 class SoundBoardWrapper(wx.Panel):
     def __init__(self, parent):
+
         self.frameParent = None
         self.associationData = {}
         wx.Panel.__init__(self, parent)
         self.parent = parent
 
+        self.soundBoardText = wx.StaticText(self, -1, "Notes")
         self.filtersText = wx.StaticText(self, -1, "Filters")
-        # listView initialization
-        self.instruments_list = wx.ListView(self, -1,
-                                            style=wx.TR_DEFAULT_STYLE + wx.TR_HIDE_ROOT + wx.TR_HAS_VARIABLE_ROW_HEIGHT)
+        self.soundboard_panel = generate_soundboard_panel(self, "notes")
+        self.filters_panel = generate_soundboard_panel(self, "filters")
 
-        self.filters_list = wx.ListView(self, -1,
-                                        style=wx.TR_DEFAULT_STYLE + wx.TR_HIDE_ROOT + wx.TR_HAS_VARIABLE_ROW_HEIGHT)
-
-        self.soundboard_panel = generate_soundboard_panel(self)
-        self.filters_panel = generate_soundboard_panel(self)
         s = wx.BoxSizer(wx.VERTICAL)
-        s.Add(self.soundboard_panel, 6, wx.EXPAND)
+        s.Add(self.soundBoardText, 0, wx.EXPAND)
+        s.Add(self.soundboard_panel, 6, wx.EXPAND | wx.LEFT | wx.TOP | wx.RIGHT)
         s.Add(self.filtersText, 0, wx.EXPAND)
-        s.Add(self.filters_panel, 1, wx.EXPAND)
+        s.Add(self.filters_panel, 1, wx.EXPAND | wx.ALL)
         self.SetSizer(s)

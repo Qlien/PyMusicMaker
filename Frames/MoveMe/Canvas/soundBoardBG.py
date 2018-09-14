@@ -47,16 +47,25 @@ class SoundBoardBG(object):
         self.minimumNoteWidth = kwargs.get("minimumNoteWidth", 20)
         self.xBegin = kwargs.get("xBegin", 40)
         self.yBegin = kwargs.get("yBegin", 20)
+        self.boardType = kwargs.get("boardType", "notes")
         self.notes = []
 
-        for k_1, key in enumerate(keys):
-            for k_2, note in enumerate(basicNotesKeys):
+        if self.boardType == "filters":
+            for i in range(0, 3):
                 self.notes.append(
-                    Note(name=note,
-                         halfNote=True if '#' in note else False,
-                         frequency=frequencyFormula(firstKeyN + (len(basicNotesKeys) * k_1) + k_2),
-                         key=key))
-        self.notes.reverse()
+                    Note(name=str(i + 1),
+                         halfNote=False,
+                         frequency=1,
+                         key=-1))
+        else:
+            for k_1, key in enumerate(keys):
+                for k_2, note in enumerate(basicNotesKeys):
+                    self.notes.append(
+                        Note(name=note,
+                             halfNote=True if '#' in note else False,
+                             frequency=frequencyFormula(firstKeyN + (len(basicNotesKeys) * k_1) + k_2),
+                             key=key))
+            self.notes.reverse()
 
     def render(self, gc):
 
@@ -123,6 +132,6 @@ class SoundBoardBG(object):
 
         textDimensions = gc.GetTextExtent(note.name)
 
-        gc.DrawTextList([note.name + ' ' + str(note.key)]
+        gc.DrawTextList([note.name + ' ' + str(note.key if note.key != -1 else "")]
                         , [(position[0] + 10, position[1] + size[1] / 2 - textDimensions[1] / 2)]
                         , [color])
