@@ -41,13 +41,15 @@ class SoundBoardSubWindow(wx.ScrolledWindow):
         self.soundPlaying = False
         self.lastMousePos = [0, 0]
         self.instrumentsPanel = None
+        self.neighbouring_vertical_view = None
+        self.neighbouring_horizontal_view = None
         self.windowType = windowType
         self.SetMinSize((100, 110))
 
         self.parent = parent
 
         self.scrollStep = kw.get("scrollStep", 30)
-        self._soundBoardBG = SoundBoardBG(parts=20, boardType=windowType)
+        self._soundBoardBG = SoundBoardBG(parts=20, boardType=windowType, parent=self)
         self.canvasDimensions = kw.get("canvasDimensions"
                                        , [1 + self._soundBoardBG.xBegin +
                                           (self._soundBoardBG.parts *
@@ -79,6 +81,7 @@ class SoundBoardSubWindow(wx.ScrolledWindow):
         self.Bind(wx.EVT_LEFT_DOWN, self.on_mouse_left_down)
         self.Bind(wx.EVT_LEFT_UP, self.on_mouse_left_up)
         self.Bind(wx.EVT_RIGHT_DOWN, self.on_mouse_right_down)
+        self.Bind(wx.EVT_SCROLLWIN, self.scroll_evt)
 
         self.Bind(wx.EVT_PAINT, self.on_paint)
 
@@ -86,6 +89,17 @@ class SoundBoardSubWindow(wx.ScrolledWindow):
 
         self.horizontalInterval = 40
         self.verticalInterval = 20
+
+    def scroll_evt(self, evt):
+        virtual_size = self.GetViewStart()
+        if self.neighbouring_vertical_view is not None:
+            self.neighbouring_vertical_view.Scroll(virtual_size[0]
+                                               , self.neighbouring_vertical_view.GetViewStart()[1])
+        if self.neighbouring_horizontal_view is not None:
+            self.neighbouring_horizontal_view.Scroll(self.neighbouring_horizontal_view.GetViewStart()[0]
+                                               , virtual_size[1])
+        evt.Skip()
+        pass
 
     def set_instruments_panel(self, instruments_panel):
         self.instrumentsPanel = instruments_panel
@@ -168,7 +182,7 @@ class SoundBoardSubWindow(wx.ScrolledWindow):
         return wholeSound
 
     def on_char(self, event):
-        var = self.ScreenToClient(wx.GetMousePosition())
+        var = self.GetViewStart()
         if event.GetUnicodeKey() == wx.WXK_SPACE:
             tempInstrument = self.instrumentsPanel.get_selected_instrument()
             if tempInstrument and tempInstrument.pluginType == PluginType.FILTER \

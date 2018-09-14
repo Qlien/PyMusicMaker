@@ -78,12 +78,22 @@ class MainWindowFrame(wx.MDIParentFrame, WindowBase, SerializationBase):
         self.instrumentsPanel.set_frame_parent(self)
         self.pluginsPanel.set_instruments_panel(self.instrumentsPanel)
         self.pluginsPanel.set_frame_parent(self)
+
         self.sound_board_tuple = generate_soundboard_wrapper(self)
         self.sound_board_panel = self.sound_board_tuple[1]
         self.sound_board_panel.set_instruments_panel(self.instrumentsPanel)
         self.sound_board_panel.set_play_menu(self.play_menu)
         self.sound_board_filters = self.sound_board_tuple[2]
         self.sound_board_filters.set_instruments_panel(self.instrumentsPanel)
+
+        self.sound_board_panel.neighbouring_vertical_view = self.sound_board_filters
+        self.sound_board_filters.neighbouring_vertical_view = self.sound_board_panel
+
+        self.sound_board_panel.neighbouring_horizontal_view = self.sound_board_tuple[3]
+        self.sound_board_tuple[3].neighbouring_horizontal_view = self.sound_board_panel
+
+        self.sound_board_filters.neighbouring_horizontal_view = self.sound_board_tuple[2]
+        self.sound_board_tuple[2].neighbouring_horizontal_view = self.sound_board_filters
 
     def destroy_windows(self):
         """destroys windows inside main frame window"""

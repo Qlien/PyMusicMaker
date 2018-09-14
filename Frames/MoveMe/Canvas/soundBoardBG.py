@@ -49,7 +49,8 @@ class SoundBoardBG(object):
         self.minimumNoteWidth = kwargs.get("minimumNoteWidth", 20)
         self.xBegin = kwargs.get("xBegin", 40)
         self.yBegin = kwargs.get("yBegin", 20)
-        self.boardType = kwargs.get("boardType", "Notes")
+        self.boardType = kwargs.get("boardType", PluginType.SOUNDGENERATOR)
+        self.parent = kwargs.get("parent", None)
         self.notes = []
 
         if self.boardType == PluginType.FILTER:
@@ -72,9 +73,12 @@ class SoundBoardBG(object):
     def render(self, gc):
 
         self.RenderGrid(gc)
-        for k, note in enumerate(self.notes):
-            self.RenderNoteInPanel(note, position=(-2, self.yBegin + k * (self.noteHeight + self.rowSpacing)),
-                                   size=(40, 20), gc=gc)
+        if self.parts == 0:
+            for k, note in enumerate(self.notes):
+                self.RenderNoteInPanel(note
+                        , position=(-2 if self.parent is None else self.parent.GetViewStart()[0] * self.parent.scrollStep
+                                    , self.yBegin + k * (self.noteHeight + self.rowSpacing))
+                                    , size=(40, 20), gc=gc)
 
     def render_grid_play_line(self, gc, pos1, pos2):
         gc.SetPen(wx.Pen('#ff0000', 1, wx.SOLID))
