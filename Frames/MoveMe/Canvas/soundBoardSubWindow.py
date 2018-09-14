@@ -7,6 +7,7 @@ import pygame
 from Frames.MoveMe.Canvas.nodesFactory import NodesFactory
 from Frames.MoveMe.Canvas.Objects.simpleTextNote import SimpleTextNote
 from Frames.MoveMe.Canvas.soundBoardBG import *
+from plugin import PluginType
 
 BUFFERED = 0
 
@@ -80,7 +81,6 @@ class SoundBoardSubWindow(wx.ScrolledWindow):
         self.Bind(wx.EVT_RIGHT_DOWN, self.on_mouse_right_down)
 
         self.Bind(wx.EVT_PAINT, self.on_paint)
-        self.Bind(wx.EVT_KEY_DOWN, self.on_char)
 
         self.SetDropTarget(TextDropTarget(self))
 
@@ -168,16 +168,25 @@ class SoundBoardSubWindow(wx.ScrolledWindow):
         return wholeSound
 
     def on_char(self, event):
+        var = self.ScreenToClient(wx.GetMousePosition())
         if event.GetUnicodeKey() == wx.WXK_SPACE:
             tempInstrument = self.instrumentsPanel.get_selected_instrument()
-            if tempInstrument:
+            if tempInstrument and tempInstrument.pluginType == PluginType.FILTER \
+                    and self.windowType == PluginType.FILTER:
+                dim = self._canvasObjects[-1].boundingBoxDimensions if self._canvasObjects else [31, 22]
+                self.instrumentToDraw = \
+                    SimpleTextNote(position=self.sound_rounded_pos(self.lastMousePos)
+                                   , text=tempInstrument.pluginName, boundingBoxDimensions=dim
+                                   , color=tempInstrument.get_color())
+            elif tempInstrument and tempInstrument.pluginType == PluginType.SOUNDGENERATOR \
+                    and self.windowType == PluginType.SOUNDGENERATOR:
                 dim = self._canvasObjects[-1].boundingBoxDimensions if self._canvasObjects else [31, 22]
                 self.instrumentToDraw = \
                     SimpleTextNote(position=self.sound_rounded_pos(self.lastMousePos)
                                    , text=tempInstrument.pluginName, boundingBoxDimensions=dim
                                    , color=tempInstrument.get_color())
 
-        if event.GetKeyCode() == wx.WXK_DELETE:
+        elif event.GetKeyCode() == wx.WXK_DELETE:
             if self._selectedObject and self._selectedObject.deletable:
                 self._selectedObject.Delete()
                 if self._selectedObject in self._canvasObjects:
@@ -218,6 +227,15 @@ class SoundBoardSubWindow(wx.ScrolledWindow):
         self.RefreshRect(rect)
 
     def create_node_from_description_at_position(self, node_description, pos):
+
+        if self.instrumentsPanel.instruments[node_description].pluginType == PluginType.FILTER \
+                and self.windowType == PluginType.FILTER:
+            self.create_note_subpart(node_description, pos)
+        elif self.instrumentsPanel.instruments[node_description].pluginType == PluginType.SOUNDGENERATOR \
+                and self.windowType == PluginType.SOUNDGENERATOR:
+            self.create_note_subpart(node_description, pos)
+
+    def create_note_subpart(self, node_description, pos):
         node = self._nodesFactory.CreateNodeFromDescription(text=node_description,
                                                             color=self.instrumentsPanel.instruments[
                                                                 node_description].get_color())
@@ -350,6 +368,7 @@ class SoundBoardSubWindow(wx.ScrolledWindow):
         self.render()
         self._lastDraggingPosition = [min(self.lastMousePos[0], self.canvasDimensions[0]),
                                       min(self.lastMousePos[1], self.canvasDimensions[1])]
+        evt.Skip()
 
     def on_mouse_left_down(self, evt):
         if self.instrumentToDraw:

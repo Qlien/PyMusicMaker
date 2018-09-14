@@ -1,5 +1,7 @@
 import wx
 
+from plugin import PluginType
+
 basicNotesKeys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 keys = [3, 4, 5, 6]
 
@@ -47,10 +49,10 @@ class SoundBoardBG(object):
         self.minimumNoteWidth = kwargs.get("minimumNoteWidth", 20)
         self.xBegin = kwargs.get("xBegin", 40)
         self.yBegin = kwargs.get("yBegin", 20)
-        self.boardType = kwargs.get("boardType", "notes")
+        self.boardType = kwargs.get("boardType", "Notes")
         self.notes = []
 
-        if self.boardType == "filters":
+        if self.boardType == PluginType.FILTER:
             for i in range(0, 3):
                 self.notes.append(
                     Note(name=str(i + 1),

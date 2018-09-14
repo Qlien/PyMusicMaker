@@ -44,7 +44,8 @@ class PluginsPanel(wx.Panel):
         s.Add(self.filters_list, 1, wx.EXPAND)
         self.SetSizer(s)
 
-        self.instruments_list.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnActivated)
+        self.instruments_list.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnInstrumentsActivated)
+        self.filters_list.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnFiltersActivated)
 
         self.plugins = self.searchForPlugins()
 
@@ -107,11 +108,18 @@ class PluginsPanel(wx.Panel):
         self.Layout()
 
     # when double clicked
-    def OnActivated(self, event):
+    def OnInstrumentsActivated(self, event):
         itemb = event.GetIndex()
         item = self.instruments_list.GetItemData(itemb)
         classInstance = self.associationData[item](self.frameParent)
         classInstance.set_instruments_panel_window(self.instrumentsPanel)
+
+    def OnFiltersActivated(self, event):
+        itemb = event.GetIndex()
+        item = self.filters_list.GetItemData(itemb)
+        classInstance = self.associationData[item](self.frameParent)
+        classInstance.set_instruments_panel_window(self.instrumentsPanel)
+
 
     # for finding plugins in folder
     def searchForPlugins(self):

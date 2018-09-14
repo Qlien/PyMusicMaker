@@ -1,7 +1,7 @@
 import wx
 
 from Frames.MoveMe.Canvas.soundBoardSubWindow import SoundBoardSubWindow
-from Frames.filters_panel import generate_filters_panel
+from plugin import PluginType
 
 
 def generate_soundboard_panel(parent, boardType):
@@ -31,12 +31,18 @@ class SoundBoardWrapper(wx.Panel):
 
         self.soundBoardText = wx.StaticText(self, -1, "Notes")
         self.filtersText = wx.StaticText(self, -1, "Filters")
-        self.soundboard_panel = generate_soundboard_panel(self, "notes")
-        self.filters_panel = generate_soundboard_panel(self, "filters")
+        self.soundboard_panel = generate_soundboard_panel(self, PluginType.SOUNDGENERATOR)
+        self.filters_panel = generate_soundboard_panel(self, PluginType.FILTER)
 
+        self.Bind(wx.EVT_CHAR_HOOK, self.on_char)
         s = wx.BoxSizer(wx.VERTICAL)
         s.Add(self.soundBoardText, 0, wx.EXPAND)
         s.Add(self.soundboard_panel, 6, wx.EXPAND | wx.LEFT | wx.TOP | wx.RIGHT)
         s.Add(self.filtersText, 0, wx.EXPAND)
         s.Add(self.filters_panel, 1, wx.EXPAND | wx.ALL)
         self.SetSizer(s)
+
+    def on_char(self, event):
+        self.soundboard_panel.on_char(event)
+        self.filters_panel.on_char(event)
+        event.Skip()

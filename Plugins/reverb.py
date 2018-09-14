@@ -172,7 +172,7 @@ class Reverb(PluginBase):
                                'pluginName': self.instrumentNameTextCtrl.GetValue()})
 
     def on_save(self, event):
-        self.instrumentsPanel.add_instrument(Oscillator, self.get_serialization_data()[1])
+        self.instrumentsPanel.add_instrument(Reverb, self.get_serialization_data()[1])
 
     def on_angle_changed1(self, event):
 
