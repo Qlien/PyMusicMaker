@@ -1,3 +1,5 @@
+import threading
+
 import wx
 
 from Frames.MoveMe.Canvas.soundBoardSubWindow import SoundBoardSubWindow
@@ -41,7 +43,6 @@ class SoundBoardWrapper(wx.Panel):
         self.soundboard_filters_notes_panel = generate_left_notes_panel(self, PluginType.FILTER)
 
         self.Bind(wx.EVT_CHAR_HOOK, self.on_char)
-        self.Bind(wx.EVT_CLOSE, self.OnClose)
         notes_sizer_wrapper = wx.BoxSizer(wx.HORIZONTAL)
         filters_sizer_wrapper = wx.BoxSizer(wx.HORIZONTAL)
 
@@ -59,10 +60,30 @@ class SoundBoardWrapper(wx.Panel):
 
         self.SetSizer(vertical_sizer_wrapper)
 
+    def on_play(self, event):
+        self.on_stop(None)
+        self.songPlayThread = threading.Thread(target=self.generate_sound, args=(True, ))
+        self.songPlayThread.start()
+
+    def on_stop(self, event):
+        if self.soundGenerator.soundPlaying:
+            self.soundGenerator.soundPlaying = False
+
+    def generate_sound(self, play_audio=False):
+        self.soundGenerator.update_sounds(self.soundboard_panel.generate_sound_representation())
+        self.soundGenerator.update_filters(self.filters_panel.generate_sound_representation())
+        self.soundGenerator.set_BPM(128)
+
+        return self.soundGenerator.play_song(play_audio=play_audio)
+
     def on_char(self, event):
         self.soundboard_panel.on_char(event)
         self.filters_panel.on_char(event)
         event.Skip()
 
-    def OnClose(self, evt):
-        evt.Veto()
+    def Destroy(self):
+        try:
+            super(wx.Panel, self).Destroy()
+            self.parent.Destroy()
+        except:
+            print('already deleted')

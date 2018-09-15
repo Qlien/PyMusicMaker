@@ -2,7 +2,6 @@ import math
 import threading
 
 import numpy as np
-import pygame
 
 from Frames.MoveMe.Canvas.nodesFactory import NodesFactory
 from Frames.MoveMe.Canvas.Objects.simpleTextNote import SimpleTextNote
@@ -120,28 +119,7 @@ class SoundBoardSubWindow(wx.ScrolledWindow):
     def get_serialization_data(self):
         return [noteData.get_serialization_data() for noteData in self._canvasObjects]
 
-    def on_play(self, event):
-        self.on_stop(None)
-        self.songPlayThread = threading.Thread(target=self.play_song)
-        self.songPlayThread.start()
-
-    def on_stop(self, event):
-        if self.soundGenerator.soundPlaying:
-            self.soundGenerator.soundPlaying = False
-
-    def play_song(self):
-        if self.soundGenerator.soundPlaying:
-            return
-
-        if self.windowType == PluginType.SOUNDGENERATOR:
-            self.soundGenerator.update_sounds(self.generate_sound())
-        if self.windowType == PluginType.SOUNDGENERATOR:
-            self.soundGenerator.update_filters(self.generate_sound())
-
-        self.soundGenerator.set_BPM(self.play_menu.bpm.GetValue())
-        self.soundGenerator.play_song()
-
-    def generate_sound(self):
+    def generate_sound_representation(self):
         small_parts = self._soundBoardBG.columnsInSubPart * self._soundBoardBG.subParts * self._soundBoardBG.parts
         x_distance = self._soundBoardBG.columnWidth + self._soundBoardBG.columnSpacing
         y_distance = self._soundBoardBG.rowHeight + self._soundBoardBG.rowSpacing

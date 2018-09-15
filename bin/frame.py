@@ -2,11 +2,12 @@ import json
 
 from Frames.instruments_panel import *
 from Frames.plugins_panel import *
-from Frames.soundboard_panel import *
+from Frames.soundboard_wrapper_panel import *
 from bin.lookupTables import Lookups
 from bin.serialization import SerializationBase
 from bin.toolbarHelper import *
 from bin.window import WindowBase
+import numpy as np
 
 
 class MainWindowFrame(wx.MDIParentFrame, WindowBase, SerializationBase):
@@ -19,8 +20,9 @@ class MainWindowFrame(wx.MDIParentFrame, WindowBase, SerializationBase):
         self.pluginsPanel = None
         self.instrumentsPanel = None
         self.sound_board_tuple = None
-        self.sound_board_panel = None
+        self.sound_board_notes_panel = None
         self.sound_board_filters = None
+        self.sound_board_panel = None
         self.play_menu = PlayMenu(self)
 
         self.generate_layout()
@@ -60,17 +62,22 @@ class MainWindowFrame(wx.MDIParentFrame, WindowBase, SerializationBase):
         """gets serialized notes and instruments data"""
 
         instruments = self.instrumentsPanel.get_serialization_data()
-        notes = self.sound_board_panel.get_serialization_data()
-        return {'instruments': instruments, 'notes': notes}
+        notes = self.sound_board_notes_panel.get_serialization_data()
+        filters = self.sound_board_filters.get_serialization_data()
+        return {'instruments': instruments, 'notes': notes, 'filters': filters}
 
     def set_serialization_data(self, data):
         """sets serialized notes and instruments"""
 
         for instrument in data['instruments']:
             self.instrumentsPanel.add_instrument(
-                getattr(self.pluginsPanel.plugins['Plugins.' + instrument[0].lower()], instrument[0]), instrument[1])
+                getattr(self.pluginsPanel.plugins['Plugins.' + instrument[0]], instrument[0]), instrument[1])
         for note in data['notes']:
-            self.sound_board_panel.add_note(note[1])
+            self.sound_board_notes_panel.add_note(note[1])
+        for filterNote in data['filters']:
+            self.sound_board_filters.add_note(filterNote[1])
+
+        self.instrumentsPanel.update_instruments()
 
     def generate_windows(self):
         """creates basic windows inside main window"""
@@ -82,17 +89,18 @@ class MainWindowFrame(wx.MDIParentFrame, WindowBase, SerializationBase):
         self.pluginsPanel.set_frame_parent(self)
 
         self.sound_board_tuple = generate_soundboard_wrapper(self)
-        self.sound_board_panel = self.sound_board_tuple[1]
-        self.sound_board_panel.set_instruments_panel(self.instrumentsPanel)
-        self.sound_board_panel.set_play_menu(self.play_menu)
+        self.sound_board_panel = self.sound_board_tuple[0]
+        self.sound_board_notes_panel = self.sound_board_tuple[1]
+        self.sound_board_notes_panel.set_instruments_panel(self.instrumentsPanel)
+        self.sound_board_notes_panel.set_play_menu(self.play_menu)
         self.sound_board_filters = self.sound_board_tuple[2]
         self.sound_board_filters.set_instruments_panel(self.instrumentsPanel)
 
-        self.sound_board_panel.neighbouring_vertical_view = self.sound_board_filters
-        self.sound_board_filters.neighbouring_vertical_view = self.sound_board_panel
+        self.sound_board_notes_panel.neighbouring_vertical_view = self.sound_board_filters
+        self.sound_board_filters.neighbouring_vertical_view = self.sound_board_notes_panel
 
-        self.sound_board_panel.neighbouring_horizontal_view = self.sound_board_tuple[3]
-        self.sound_board_tuple[3].neighbouring_horizontal_view = self.sound_board_panel
+        self.sound_board_notes_panel.neighbouring_horizontal_view = self.sound_board_tuple[3]
+        self.sound_board_tuple[3].neighbouring_horizontal_view = self.sound_board_notes_panel
 
         self.sound_board_filters.neighbouring_horizontal_view = self.sound_board_tuple[2]
         self.sound_board_tuple[2].neighbouring_horizontal_view = self.sound_board_filters
@@ -102,15 +110,12 @@ class MainWindowFrame(wx.MDIParentFrame, WindowBase, SerializationBase):
 
         self.play_menu.unbind_play_button(self.sound_board_panel.on_play)
         self.play_menu.unbind_stop_button(self.sound_board_panel.on_stop)
+        self.sound_board_panel.Destroy()
+        self.sound_board_panel = None
         self.instrumentsPanel.Destroy()
         self.instrumentsPanel = None
         self.pluginsPanel.Destroy()
         self.pluginsPanel = None
-        self.sound_board_filters.Destroy()
-        self.sound_board_filters = None
-        self.sound_board_panel.Destroy()
-        self.sound_board_panel = None
-        self.sound_board_tuple.Destroy()
         self.sound_board_tuple = None
 
     def on_exit(self):
@@ -169,13 +174,7 @@ class MainWindowFrame(wx.MDIParentFrame, WindowBase, SerializationBase):
             # save the current contents in the file
             pathname = fileDialog.GetPath()
             try:
-                import wave
-                with wave.open(pathname, 'w') as file:
-                    file.setframerate(44000)
-                    file.setnchannels(1)
-                    file.setsampwidth(2)
-                    sound = self.sound_board_tuple.generate_sound()
-                    file.writeframesraw(sound)
-                    file.close()
+                import scipy.io.wavfile
+                scipy.io.wavfile.write(pathname, 44100, np.array(self.sound_board_panel.generate_sound(False)))
             except IOError:
                 wx.LogError("Cannot save current data in file '%s'." % pathname)

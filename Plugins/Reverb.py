@@ -1,7 +1,6 @@
 import random
 
 import numpy as np
-import pygame
 import wx
 import wx.lib.agw.knobctrl as KC
 
@@ -106,8 +105,6 @@ class Reverb(PluginBase):
         self.SetSizer(panelsizer)
         panelsizer.Layout()
         self.sound = None
-        pygame.mixer.pre_init(44000, -16, 1, 512)
-        pygame.mixer.init()
 
         self.Bind(KC.EVT_KC_ANGLE_CHANGED, self.on_angle_changed1, self.knob1)
         self.Bind(KC.EVT_KC_ANGLE_CHANGED, self.on_angle_changed2, self.knob2)
@@ -129,21 +126,35 @@ class Reverb(PluginBase):
 
     def on_char(self, event):
         if event.GetUnicodeKey() == wx.WXK_SPACE:
-            pygame.mixer.quit()
-            pygame.mixer.pre_init(44100, -16, 1, 512)
-            pygame.mixer.init(44100, -16, 1, 512)
-
-            sound = pygame.sndarray.make_sound(np.array(self.generate_sound(), dtype=np.int16))
-            # play once, then loop forever
-            sound.play()
+            pass
 
         event.Skip()
 
-    def generate_sound(self, frequency=440, duration=1.0, sample_rate=44000, bits=16):
+    def get_filter_generator(self, current_sound_wrapper
+                     , frequency=440, duration=1.0, sample_rate=44000, bits=16
+                     , framesInterval=128, bpm=128 ):
         self.oscSound.update_damping_parameter(self.knob3.GetValue())
         self.oscSound.update_fading_parameter(self.knob2.GetValue())
         self.oscSound.update_noise_parameter(self.knob1.GetValue())
-        return self.oscSound.generate_sound(frequency=frequency, duration=duration, sample_rate=sample_rate, bits=bits)
+
+        n_samples = int(round(duration * sample_rate))
+        current_index = 0
+        while True:
+            if len(current_sound_wrapper.currentSoundBuffer) > 0:
+                yield current_sound_wrapper.currentSoundBuffer[-1] * 0.1
+            else:
+                yield 0
+            current_index += 1
+
+            if current_index > n_samples:
+                break
+        # return self.oscSound.generate_sound(frequency=frequency, duration=duration, sample_rate=sample_rate, bits=bits
+        #                                     , framesInterval=self.sampling_rate, bpm=128)
+
+    def internal_filter_generator(self, previous_sound_array
+                                  , current_buffer_array, frequency
+                                  , duration, sample_rate, bits):
+        pass
 
     def get_color(self):
         return self.instrumentColorPicker.GetColour()
@@ -161,7 +172,7 @@ class Reverb(PluginBase):
         self.knob3BeforeSave = self.knob3.GetValue()
 
     def get_serialization_data(self):
-        return ('Oscillator', {'isSound': True,
+        return ('Reverb', {'isSound': True,
                                'knob1Value': self.knob1.GetValue(),
                                'knob2Value': self.knob2.GetValue(),
                                'knob3Value': self.knob3.GetValue(),

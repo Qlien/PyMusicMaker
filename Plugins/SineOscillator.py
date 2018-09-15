@@ -2,7 +2,6 @@ import random
 
 import numpy as np
 import pyaudio
-import pygame
 import wx
 import wx.lib.agw.knobctrl as KC
 
@@ -11,14 +10,15 @@ from bin.plugin import PluginBase, PluginType
 
 
 class SineOscillator(PluginBase):
-    icon = wx.Bitmap('Plugins\Oscillator\Graphics\icon.png')
+    icon = wx.Bitmap('Plugins\icons\sine.png')
     pluginType = PluginType.SOUNDGENERATOR
 
     def __init__(self, frameParent, **kwargs):
         window_title = self.window_title()
         super(SineOscillator, self).__init__(frameParent, PluginType.SOUNDGENERATOR
                                              , wx.Bitmap('Plugins\Oscillator\Graphics\icon.png')
-                                             , name=kwargs.get('pluginName', window_title))
+                                             , name=kwargs.get('pluginName', window_title)
+                                             , **kwargs)
 
         self.oscSound = None
         self.instrumentsPanel = None
@@ -106,8 +106,6 @@ class SineOscillator(PluginBase):
         self.SetSizer(panelsizer)
         panelsizer.Layout()
         self.sound = None
-        pygame.mixer.pre_init(44000, -16, 1, 512)
-        pygame.mixer.init()
 
         self.Bind(KC.EVT_KC_ANGLE_CHANGED, self.on_angle_changed1, self.knob1)
         self.Bind(KC.EVT_KC_ANGLE_CHANGED, self.on_angle_changed2, self.knob2)
@@ -178,15 +176,15 @@ class SineOscillator(PluginBase):
         self.knob3BeforeSave = self.knob3.GetValue()
 
     def get_serialization_data(self):
-        return ('Oscillator', {'isSound': True,
-                               'knob1Value': self.knob1.GetValue(),
-                               'knob2Value': self.knob2.GetValue(),
-                               'knob3Value': self.knob3.GetValue(),
-                               'colourRed': self.colourRed,
-                               'colourGreen': self.colourGreen,
-                               'colourBlue': self.colourBlue,
-                               'colourAlpha': self.colourAlpha,
-                               'pluginName': self.instrumentNameTextCtrl.GetValue()})
+        return ('SineOscillator', {'isSound': True,
+                                   'knob1Value': self.knob1.GetValue(),
+                                   'knob2Value': self.knob2.GetValue(),
+                                   'knob3Value': self.knob3.GetValue(),
+                                   'colourRed': self.colourRed,
+                                   'colourGreen': self.colourGreen,
+                                   'colourBlue': self.colourBlue,
+                                   'colourAlpha': self.colourAlpha,
+                                   'pluginName': self.instrumentNameTextCtrl.GetValue()})
 
     def on_save(self, event):
         self.instrumentsPanel.add_instrument(SineOscillator, self.get_serialization_data()[1])

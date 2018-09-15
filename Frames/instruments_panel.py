@@ -22,7 +22,7 @@ class Instruments(wx.Panel):
         wx.Panel.__init__(self, parent)
         # listView initialization
         self.listView = wx.ListView(self, -1,
-                                    style=wx.TR_DEFAULT_STYLE | wx.TR_HIDE_ROOT | wx.TR_HAS_VARIABLE_ROW_HEIGHT)
+                                    style=wx.LC_LIST | wx.LC_SINGLE_SEL)
         s = wx.BoxSizer(wx.VERTICAL)
         s.Add(self.listView, 1, wx.EXPAND)
         self.SetSizer(s)

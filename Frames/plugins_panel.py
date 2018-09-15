@@ -15,6 +15,8 @@ def generate_plugins_panel(parent):
     panel = PluginsPanel(win)
     s.Add(panel, 1, wx.EXPAND)
     win.SetSizer(s)
+    win.SetSizeHints(110, 600, 1200, 1200)
+    win.Show(True)
     return panel
 
 class CheckListCtrl(wx.ListCtrl, ListCtrlAutoWidthMixin):
@@ -59,10 +61,19 @@ class PluginsPanel(wx.Panel):
 
     def Destroy(self):
         try:
+            self.Unbind(event=wx.EVT_LIST_ITEM_ACTIVATED
+                        , handler=self.OnInstrumentsActivated
+                        , source=self.instruments_list)
+            self.Unbind(event=wx.EVT_LIST_ITEM_ACTIVATED
+                        , handler=self.OnFiltersActivated
+                        , source=self.filters_list)
+            self.instruments_list.Destroy()
+            self.filters_list.Destroy()
             super(wx.Panel, self).Destroy()
             self.parent.Destroy()
-        except:
+        except Exception:
             print('already deleted')
+            raise
 
     def set_instruments_panel(self, instruments_panel):
         self.instrumentsPanel = instruments_panel
@@ -82,14 +93,15 @@ class PluginsPanel(wx.Panel):
         info.m_text = "Filters"
         self.filters_list.InsertColumn(0, info)
 
-        image_list = wx.ImageList(*size)
+        plugins_image_list = wx.ImageList(*size)
+        filters_image_list = wx.ImageList(*size)
 
         for key, (name, plugin) in enumerate(self.plugins.items()):
             classWrapper = getattr(plugin, name[name.find('.') + 1:])
             self.associationData[key] = classWrapper
-            image = image_list.Add(
-                classWrapper.icon.ConvertToImage().Rescale(*size).ConvertToBitmap())
             if classWrapper.pluginType == PluginType.SOUNDGENERATOR:
+                image = plugins_image_list.Add(
+                    classWrapper.icon.ConvertToImage().Rescale(*size).ConvertToBitmap())
                 item = self.instruments_list.InsertItem(key,
                                                         (name[name.find('.') + 1:]),
                                                         image)
@@ -97,14 +109,16 @@ class PluginsPanel(wx.Panel):
                 self.instruments_list.SetItemImage(item, image, wx.TreeItemIcon_Normal)
 
             if classWrapper.pluginType == PluginType.FILTER:
+                image = filters_image_list.Add(
+                    classWrapper.icon.ConvertToImage().Rescale(*size).ConvertToBitmap())
                 item = self.filters_list.InsertItem(key,
                                                         (name[name.find('.') + 1:]),
                                                         image)
                 self.filters_list.SetItemData(item, key)
                 self.filters_list.SetItemImage(item, image, wx.TreeItemIcon_Normal)
 
-        self.instruments_list.AssignImageList(image_list, wx.IMAGE_LIST_SMALL)
-        self.filters_list.AssignImageList(image_list, wx.IMAGE_LIST_SMALL)
+        self.instruments_list.AssignImageList(plugins_image_list, wx.IMAGE_LIST_SMALL)
+        self.filters_list.AssignImageList(filters_image_list, wx.IMAGE_LIST_SMALL)
         self.Layout()
 
     # when double clicked
@@ -131,3 +145,5 @@ class PluginsPanel(wx.Panel):
 
     def iter_namespace(self, ns_pkg):
         return pkgutil.iter_modules(ns_pkg.__path__, ns_pkg.__name__ + ".")
+
+
