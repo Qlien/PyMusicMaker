@@ -85,7 +85,7 @@ class PluginsPanel(wx.Panel):
         image_list = wx.ImageList(*size)
 
         for key, (name, plugin) in enumerate(self.plugins.items()):
-            classWrapper = getattr(plugin, name[name.find('.') + 1:].title())
+            classWrapper = getattr(plugin, name[name.find('.') + 1:])
             self.associationData[key] = classWrapper
             image = image_list.Add(
                 classWrapper.icon.ConvertToImage().Rescale(*size).ConvertToBitmap())

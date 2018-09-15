@@ -3,7 +3,7 @@ import unittest
 
 import time
 import wx
-from Plugins.Oscillator.oscSound import OscillatorSound
+from Plugins.Oscillator.OscSound import OscSound
 
 
 class MyDialog(wx.Dialog):
@@ -15,7 +15,7 @@ class MyDialog(wx.Dialog):
 class TestMyDialog(unittest.TestCase):
 
     def setUp(self):
-        self.osc = OscillatorSound()
+        self.osc = OscSound()
         self.osc.dampingParameter = 0
         self.osc.noiseParameter = 0
         self.osc.fadingParameter = 0

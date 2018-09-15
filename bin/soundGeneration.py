@@ -6,7 +6,7 @@ import pyaudio
 
 basicNotesKeys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 keys = [3, 4, 5, 6]
-firstKeyN = 28
+firstKeyN = 75
 
 
 def frequencyFormula(n):
@@ -41,8 +41,7 @@ class SoundGenerator:
                         channels=1,
                         rate=self.sampling_rate,
                         output=True,
-                        frames_per_buffer=self.sampling_rate,
-                        stream_callback=self.pyAudioCallback)
+                        frames_per_buffer=self.sampling_rate)
 
         stream.start_stream()
         ct = time.time()
@@ -52,12 +51,13 @@ class SoundGenerator:
             internal_buffer_counter = 0
             if current_interval_value % r == 0:
                 if len(internal_wave_array) > 0:
-                    self.soundChunksQueue.put(np.array(internal_wave_array).astype(np.float32))
+                    SoundGenerator.soundChunksQueue.put(np.array(internal_wave_array).astype(np.float32).tobytes())
+                    stream.write(SoundGenerator.soundChunksQueue.get())
                     SoundArray.extend(internal_wave_array)
                     internal_wave_array = []
                 if int(current_interval_value / r) in self.sounds:
                     current_generators.extend([x.plugin.generate_sound(
-                        frequency=frequencyFormula(x.verticalElementPosition + firstKeyN)
+                        frequency=frequencyFormula(firstKeyN - x.verticalElementPosition)
                         , duration=(60. * x.length / self.BPM), sample_rate=self.sampling_rate
                         , framesInterval=self.sampling_rate, bpm=128) for x in self.sounds[int(current_interval_value / r)]])
 
@@ -66,10 +66,11 @@ class SoundGenerator:
             generators_values = 0
             for x in current_generators:
                 try:
-                    generators_values = next(x)
+                    generators_values += next(x)
                     generators_counted += 1
                 except StopIteration:
                     generators_to_remove.append(x)
+                    generators_counted -= 1
 
             if generators_counted > 0:
                 generators_values /= generators_counted
@@ -81,15 +82,18 @@ class SoundGenerator:
             current_interval_value += 1
             internal_buffer_counter += 1
 
-        while stream.is_active():
-            time.sleep(0.5)
+        stream.stop_stream()
+        stream.close()
+
+        # close PyAudio (7)
+        p.terminate()
         print(time.time() - ct)
         self.soundPlaying = False
         pass
 
     @staticmethod
     def pyAudioCallback(in_data, frame_count, time_info, status):
-        return (SoundGenerator.soundChunksQueue.get(), pyaudio.paContinue)
+        return SoundGenerator.soundChunksQueue.get(), pyaudio.paContinue
 
     def update_sounds(self, soundElements):
         self.sounds = soundElements

@@ -1,23 +1,26 @@
 import random
 
 import numpy as np
+import pyaudio
 import pygame
 import wx
 import wx.lib.agw.knobctrl as KC
 
-from Plugins.Oscillator.oscSound import OscillatorSound
+from Plugins.Oscillator.OscSound import OscSound
 from bin.plugin import PluginBase, PluginType
 
 
-class Oscillator(PluginBase):
+class SineOscillator(PluginBase):
     icon = wx.Bitmap('Plugins\Oscillator\Graphics\icon.png')
     pluginType = PluginType.SOUNDGENERATOR
 
     def __init__(self, frameParent, **kwargs):
-        super(Oscillator, self).__init__(frameParent, PluginType.SOUNDGENERATOR
-                                         , wx.Bitmap('Plugins\Oscillator\Graphics\icon.png')
-                                         , name=kwargs.get('pluginName', 'Oscillator'))
+        window_title = self.window_title()
+        super(SineOscillator, self).__init__(frameParent, PluginType.SOUNDGENERATOR
+                                             , wx.Bitmap('Plugins\Oscillator\Graphics\icon.png')
+                                             , name=kwargs.get('pluginName', window_title))
 
+        self.oscSound = None
         self.instrumentsPanel = None
 
         self.knob1 = KC.KnobCtrl(self, -1, size=(100, 100))
@@ -26,27 +29,24 @@ class Oscillator(PluginBase):
 
         self.isSound = kwargs.get('isSound', False)
 
+        # noise
         self.knob1.SetTags(range(0, 101, 5))
         self.knob1.SetAngularRange(-45, 225)
         self.knob1.SetValue(kwargs.get('knob1Value', 0))
 
+        # fading
         self.knob2.SetTags(range(0, 101, 5))
         self.knob2.SetAngularRange(-45, 225)
         self.knob2.SetValue(kwargs.get('knob2Value', 0))
 
+        # damping
         self.knob3.SetTags(range(0, 101, 5))
         self.knob3.SetAngularRange(-45, 225)
         self.knob3.SetValue(kwargs.get('knob3Value', 50))
 
-        self.oscSound = OscillatorSound()
-
-        self.oscSound.update_noise_parameter(self.knob1.GetValue())
-        self.oscSound.update_fading_parameter(self.knob2.GetValue())
-        self.oscSound.update_damping_parameter(self.knob3.GetValue())
-
         self.knobtracker1 = wx.StaticText(self, -1, "Value = " + str(self.knob1.GetValue()))
         self.knobtracker2 = wx.StaticText(self, -1, "Value = " + str(self.knob2.GetValue()))
-        self.knobtracker3 = wx.StaticText(self, -1, "Value = " + str(self.knob3.GetValue()))
+        self.knobtracker3 = wx.StaticText(self, -1, "Value = " + str(self.knob3.GetValue() - 50))
 
         self.knob1BeforeSave = self.knob1.GetValue()
         self.knob2BeforeSave = self.knob2.GetValue()
@@ -121,6 +121,12 @@ class Oscillator(PluginBase):
         else:
             self.Bind(wx.EVT_BUTTON, self.on_save)
 
+    def window_title(self):
+        return "Sine Oscillator"
+
+    def set_osc(self):
+        self.oscSound = OscSound()
+
     def set_instruments_panel_window(self, instrumentsPanel):
         self.instrumentsPanel = instrumentsPanel
 
@@ -129,20 +135,30 @@ class Oscillator(PluginBase):
 
     def on_char(self, event):
         if event.GetUnicodeKey() == wx.WXK_SPACE:
-            pygame.mixer.quit()
-            pygame.mixer.pre_init(44100, -16, 1, 512)
-            pygame.mixer.init(44100, -16, 1, 512)
+            p = pyaudio.PyAudio()
+            # for paFloat32 sample values must be in range [-1.0, 1.0]
+            stream = p.open(format=pyaudio.paFloat32,
+                            channels=1,
+                            rate=44100,
+                            output=True,
+                            frames_per_buffer=44100)
 
-            sound = pygame.sndarray.make_sound(np.array(self.generate_sound(), dtype=np.int16))
-            # play once, then loop forever
-            sound.play()
+            stream.start_stream()
+            stream.write(np.array([x for x in self.generate_sound()]).astype(np.float32))
+            stream.stop_stream()
+            stream.close()
+
+            # close PyAudio (7)
+            p.terminate()
 
         event.Skip()
 
     def generate_sound(self, frequency=440, duration=1.0, sample_rate=44000, bits=16, framesInterval=1024, bpm=128):
-        self.oscSound.update_damping_parameter(self.knob3.GetValue())
-        self.oscSound.update_fading_parameter(self.knob2.GetValue())
+        if not self.oscSound:
+            self.set_osc()
         self.oscSound.update_noise_parameter(self.knob1.GetValue())
+        self.oscSound.update_fading_parameter(self.knob2.GetValue())
+        self.oscSound.update_damping_parameter(self.knob3.GetValue() - 50)
         return self.oscSound.sound_generator(frequency=frequency, duration=duration, sample_rate=sample_rate, bits=bits
                                              , framesInterval=1024, bpm=128)
 
@@ -173,7 +189,7 @@ class Oscillator(PluginBase):
                                'pluginName': self.instrumentNameTextCtrl.GetValue()})
 
     def on_save(self, event):
-        self.instrumentsPanel.add_instrument(Oscillator, self.get_serialization_data()[1])
+        self.instrumentsPanel.add_instrument(SineOscillator, self.get_serialization_data()[1])
 
     def on_angle_changed1(self, event):
 
@@ -190,7 +206,7 @@ class Oscillator(PluginBase):
     def on_angle_changed3(self, event):
 
         value = event.GetValue()
-        self.knobtracker3.SetLabel("Value = " + str(value))
+        self.knobtracker3.SetLabel("Value = " + str(value - 50))
         self.knobtracker3.Refresh()
 
     def on_color_changed(self, event):

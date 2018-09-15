@@ -5,7 +5,7 @@ import pygame
 import wx
 import wx.lib.agw.knobctrl as KC
 
-from Plugins.Oscillator.oscSound import OscillatorSound
+from Plugins.Oscillator.OscSound import OscSound
 from bin.plugin import PluginBase, PluginType
 
 
@@ -38,7 +38,7 @@ class Reverb(PluginBase):
         self.knob3.SetAngularRange(-45, 225)
         self.knob3.SetValue(kwargs.get('knob3Value', 50))
 
-        self.oscSound = OscillatorSound()
+        self.oscSound = OscSound()
 
         self.oscSound.update_noise_parameter(self.knob1.GetValue())
         self.oscSound.update_fading_parameter(self.knob2.GetValue())
