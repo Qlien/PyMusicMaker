@@ -9,7 +9,7 @@ from bin.plugin import PluginBase, PluginType
 
 
 class Flanger(PluginBase):
-    icon = wx.Bitmap('Plugins\Oscillator\Graphics\icon.png')
+    icon = wx.Bitmap('Plugins\icons\\flanger.png')
     pluginType = PluginType.FILTER
 
     def __init__(self, frameParent, **kwargs):
@@ -41,7 +41,7 @@ class Flanger(PluginBase):
         bottomsizer = wx.BoxSizer(wx.HORIZONTAL)
         leftknobsizer = wx.StaticBoxSizer(leftknobsizer_staticbox, wx.VERTICAL)
         self.base_menu = self.base_top_window_menu_sizer_getter(
-            frameParent, PluginType.SOUNDGENERATOR, Flanger.icon, **kwargs)
+            frameParent, PluginType.FILTER, Flanger.icon, **kwargs)
 
         self.colourRed = kwargs.get('colourRed', random.randint(0, 255))
         self.colourGreen = kwargs.get('colourGreen', random.randint(0, 255))
@@ -76,7 +76,7 @@ class Flanger(PluginBase):
         event.Skip()
 
     def get_filter_generator(self, current_sound_wrapper
-                     , frequency=440, duration=1.0, sample_rate=44000, bits=16
+                     , frequency=440, duration=1.0, sample_rate=44100, bits=16
                      , framesInterval=128, bpm=128 ):
 
         n_samples = int(round(duration * sample_rate))
@@ -90,8 +90,6 @@ class Flanger(PluginBase):
 
             if current_index > n_samples:
                 break
-        # return self.oscSound.generate_sound(frequency=frequency, duration=duration, sample_rate=sample_rate, bits=bits
-        #                                     , framesInterval=self.sampling_rate, bpm=128)
 
     def internal_filter_generator(self, previous_sound_array
                                   , current_buffer_array, frequency
@@ -103,26 +101,20 @@ class Flanger(PluginBase):
 
     def on_close(self, event):
         self.knob1.SetValue(self.knob1BeforeSave)
-        self.knob2.SetValue(self.knob2BeforeSave)
-        self.knob3.SetValue(self.knob3BeforeSave)
 
         print('closing')
 
     def on_modify(self, event):
         self.knob1BeforeSave = self.knob1.GetValue()
-        self.knob2BeforeSave = self.knob2.GetValue()
-        self.knob3BeforeSave = self.knob3.GetValue()
 
     def get_serialization_data(self):
         return ('Reverb', {'isSound': True,
-                               'knob1Value': self.knob1.GetValue(),
-                               'knob2Value': self.knob2.GetValue(),
-                               'knob3Value': self.knob3.GetValue(),
-                               'colourRed': self.colourRed,
-                               'colourGreen': self.colourGreen,
-                               'colourBlue': self.colourBlue,
-                               'colourAlpha': self.colourAlpha,
-                               'pluginName': self.instrumentNameTextCtrl.GetValue()})
+                           'knob1Value': self.knob1.GetValue(),
+                           'colourRed': self.colourRed,
+                           'colourGreen': self.colourGreen,
+                           'colourBlue': self.colourBlue,
+                           'colourAlpha': self.colourAlpha,
+                           'pluginName': self.instrumentNameTextCtrl.GetValue()})
 
     def on_save(self, event):
         self.instrumentsPanel.add_instrument(Flanger, self.get_serialization_data()[1])

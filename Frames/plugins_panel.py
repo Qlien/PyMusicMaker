@@ -33,7 +33,7 @@ class PluginsPanel(wx.Panel):
         wx.Panel.__init__(self, parent)
         self.parent = parent
 
-        self.instrumentsText = wx.StaticText(self, -1, "Instruments")
+        self.instrumentsText = wx.StaticText(self, -1, "Generators")
         self.filtersText = wx.StaticText(self, -1, "Filters")
         # listView initialization
         self.instruments_list = CheckListCtrl(self)
