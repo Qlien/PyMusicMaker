@@ -5,7 +5,7 @@ import wx
 
 
 class PluginBase(wx.Panel):
-    def __init__(self, frameParent, type, icon, name='', **kwargs):
+    def __init__(self, frameParent, pluginType, icon, name='', **kwargs):
         self.frameParent = frameParent
         self.win = wx.MDIChildFrame(frameParent, -1, name, size=(600, 400),
                                     style=wx.DEFAULT_FRAME_STYLE ^ wx.MINIMIZE_BOX ^ wx.MAXIMIZE_BOX)
@@ -17,9 +17,9 @@ class PluginBase(wx.Panel):
         self.pluginName = name
         self.isSound = kwargs.get('isSound', False)
 
+    def base_top_window_menu_sizer_getter(self, frameParent, pluginType, pluginIcon, **kwargs):
         instrumentNameText = wx.StaticText(self, id=-1, label="Name:")
         self.instrumentNameTextCtrl = wx.TextCtrl(self, id=-1, value=self.pluginName)
-        instrumentColorText = wx.StaticText(self, id=-1, label="Color:")
 
         self.menusizer_staticbox = wx.StaticBox(self, -1, "Menu")
         self.menuStaticSizer = wx.StaticBoxSizer(self.menusizer_staticbox, wx.HORIZONTAL)
@@ -45,18 +45,20 @@ class PluginBase(wx.Panel):
         self.menuStaticSizer.Add(saveButton, 0, wx.ALL | wx.EXPAND, 5)
 
         self.frameParent = frameParent
-        self.icon = icon
-        self.pluginType = type
+        self.icon = pluginIcon
+        self.pluginType = pluginType
         self.iconSize = (100, 50)
         self.Bind(wx.EVT_CHAR_HOOK, self.on_char)
-        self.SetSizer(self.menuStaticSizer)
-        self.menuStaticSizer.Layout()
+        self.Bind(wx.EVT_COLOURPICKER_CHANGED, self.on_color_changed, self.instrumentColorPicker)
+
         if self.isSound:
             self.win.Bind(wx.EVT_CLOSE, self.on_exit_app)
             self.Bind(wx.EVT_WINDOW_DESTROY, self.on_close)
             self.Bind(wx.EVT_BUTTON, self.on_modify)
         else:
             self.Bind(wx.EVT_BUTTON, self.on_save)
+
+        return self.menuStaticSizer
 
     def on_save(self, event):
         self.instrumentsPanel.add_instrument(PluginBase, self.get_serialization_data()[1])
@@ -89,6 +91,21 @@ class PluginBase(wx.Panel):
 
     def on_modify(self, event):
         pass
+
+    def get_serialization_data(self):
+        return (self.pluginName, {'isSound': True,
+                                   'colourRed': self.colourRed,
+                                   'colourGreen': self.colourGreen,
+                                   'colourBlue': self.colourBlue,
+                                   'colourAlpha': self.colourAlpha,
+                                   'pluginName': self.instrumentNameTextCtrl.GetValue()})
+
+    def on_color_changed(self, event):
+
+        self.colourRed = event.GetColour().red
+        self.colourGreen = event.GetColour().green
+        self.colourBlue = event.GetColour().blue
+        self.colourAlpha = event.GetColour().alpha
 
 class PluginType(Enum):
     SOUNDGENERATOR = 1

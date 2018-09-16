@@ -1,5 +1,3 @@
-import random
-
 import numpy as np
 import pyaudio
 import wx
@@ -26,8 +24,6 @@ class SineOscillator(PluginBase):
         self.knob1 = KC.KnobCtrl(self, -1, size=(100, 100))
         self.knob2 = KC.KnobCtrl(self, -1, size=(100, 100))
         self.knob3 = KC.KnobCtrl(self, -1, size=(100, 100))
-
-        self.isSound = kwargs.get('isSound', False)
 
         # noise
         self.knob1.SetTags(range(0, 101, 5))
@@ -56,40 +52,17 @@ class SineOscillator(PluginBase):
         middleknobsizer_staticbox = wx.StaticBox(self, -1, "Fading")
         tightknobsizer_staticbox = wx.StaticBox(self, -1, "Damping")
 
-        menusizer_staticbox = wx.StaticBox(self, -1, "Menu")
+        self.base_menu = self.base_top_window_menu_sizer_getter(
+            frameParent, PluginType.SOUNDGENERATOR, SineOscillator.icon, **kwargs)
 
         panelsizer = wx.BoxSizer(wx.VERTICAL)
         menusizer = wx.BoxSizer(wx.HORIZONTAL)
         bottomsizer = wx.BoxSizer(wx.HORIZONTAL)
-        menuStaticSizer = wx.StaticBoxSizer(menusizer_staticbox, wx.HORIZONTAL)
         leftknobsizer = wx.StaticBoxSizer(leftknobsizer_staticbox, wx.VERTICAL)
         middleknobsizer = wx.StaticBoxSizer(middleknobsizer_staticbox, wx.VERTICAL)
         rightknobsizer = wx.StaticBoxSizer(tightknobsizer_staticbox, wx.VERTICAL)
 
-        instrumentNameText = wx.StaticText(self, id=-1, label="Name:")
-        self.instrumentNameTextCtrl = wx.TextCtrl(self, id=-1, value=self.pluginName)
-
-        instrumentColorText = wx.StaticText(self, id=-1, label="Color:")
-        self.colourRed = kwargs.get('colourRed', random.randint(0, 255))
-        self.colourGreen = kwargs.get('colourGreen', random.randint(0, 255))
-        self.colourBlue = kwargs.get('colourBlue', random.randint(0, 255))
-        self.colourAlpha = kwargs.get('colourAlpha', 255)
-        self.instrumentColorPicker = wx.ColourPickerCtrl(self, id=-1,
-                                                         colour=wx.Colour(self.colourRed, self.colourGreen,
-                                                                          self.colourBlue, alpha=self.colourAlpha))
-        if self.isSound:
-            self.instrumentNameTextCtrl.Disable()
-            self.instrumentColorPicker.Disable()
-
-        saveButton = wx.Button(self, -1, "Modify" if self.isSound else "Generate Sound")
-
-        menuStaticSizer.Add(instrumentNameText, 0, wx.ALL | wx.EXPAND, 5)
-        menuStaticSizer.Add(self.instrumentNameTextCtrl, 2, wx.ALL | wx.EXPAND, 5)
-        menuStaticSizer.Add(instrumentColorText, 0, wx.ALL | wx.EXPAND, 5)
-        menuStaticSizer.Add(self.instrumentColorPicker, 0, wx.ALL | wx.EXPAND, 5)
-        menuStaticSizer.Add(saveButton, 0, wx.ALL | wx.EXPAND, 5)
-
-        menusizer.Add(menuStaticSizer, 1, wx.ALL | wx.EXPAND, 5)
+        menusizer.Add(self.base_menu, 1, wx.ALL | wx.EXPAND, 5)
         panelsizer.Add(menusizer, 0, wx.EXPAND | wx.ALL)
 
         leftknobsizer.Add(self.knob1, 1, wx.ALL | wx.EXPAND, 5)
@@ -110,7 +83,6 @@ class SineOscillator(PluginBase):
         self.Bind(KC.EVT_KC_ANGLE_CHANGED, self.on_angle_changed1, self.knob1)
         self.Bind(KC.EVT_KC_ANGLE_CHANGED, self.on_angle_changed2, self.knob2)
         self.Bind(KC.EVT_KC_ANGLE_CHANGED, self.on_angle_changed3, self.knob3)
-        self.Bind(wx.EVT_COLOURPICKER_CHANGED, self.on_color_changed, self.instrumentColorPicker)
 
         if self.isSound:
             self.win.Bind(wx.EVT_CLOSE, self.on_exit_app)
@@ -206,10 +178,3 @@ class SineOscillator(PluginBase):
         value = event.GetValue()
         self.knobtracker3.SetLabel("Value = " + str(value - 50))
         self.knobtracker3.Refresh()
-
-    def on_color_changed(self, event):
-
-        self.colourRed = event.GetColour().red
-        self.colourGreen = event.GetColour().green
-        self.colourBlue = event.GetColour().blue
-        self.colourAlpha = event.GetColour().alpha
