@@ -5,17 +5,18 @@ import wx
 import wx.lib.agw.knobctrl as KC
 
 from Plugins.Oscillator.OscSound import OscSound
+from bin.lookupTables import Lookups
 from bin.plugin import PluginBase, PluginType
 
 
-class Flanger(PluginBase):
-    icon = wx.Bitmap('Plugins\icons\\flanger.png')
+class Modulator(PluginBase):
+    icon = wx.Bitmap('Plugins\icons\\modulator.png')
     pluginType = PluginType.FILTER
 
     def __init__(self, frameParent, **kwargs):
-        super(Flanger, self).__init__(frameParent, PluginType.FILTER
+        super(Modulator, self).__init__(frameParent, PluginType.FILTER
                                       , wx.Bitmap('Plugins\Oscillator\Graphics\icon.png')
-                                      , name=kwargs.get('pluginName', 'Flanger'))
+                                      , name=kwargs.get('pluginName', 'Modulator'))
 
         self.instrumentsPanel = None
 
@@ -24,7 +25,7 @@ class Flanger(PluginBase):
 
         self.knob1.SetTags(range(0, 101, 5))
         self.knob1.SetAngularRange(-45, 225)
-        self.knob1.SetValue(kwargs.get('knob1Value', 0))
+        self.knob1.SetValue(kwargs.get('knob1Value', 41))
 
         self.knobtracker1 = wx.StaticText(self, -1, "Value = " + str(self.knob1.GetValue()))
 
@@ -37,7 +38,7 @@ class Flanger(PluginBase):
         bottomsizer = wx.BoxSizer(wx.HORIZONTAL)
         leftknobsizer = wx.StaticBoxSizer(leftknobsizer_staticbox, wx.VERTICAL)
         self.base_menu = self.base_top_window_menu_sizer_getter(
-            frameParent, PluginType.FILTER, Flanger.icon, **kwargs)
+            frameParent, PluginType.FILTER, Modulator.icon, **kwargs)
 
         self.colourRed = kwargs.get('colourRed', random.randint(0, 255))
         self.colourGreen = kwargs.get('colourGreen', random.randint(0, 255))
@@ -75,29 +76,17 @@ class Flanger(PluginBase):
                              , frequency=440, duration=1.0, sample_rate=44100, bits=16
                              , framesInterval=128, bpm=128):
 
-        wholeArray = current_sound_wrapper.previousSoundArray[:]
-        knob_value = self.knob1BeforeSave / 100
-        fade_distance = int(sample_rate * knob_value)
-
-        last_array_index_to_processs = len(wholeArray) - 1
+        knob_value = int(self.knob1BeforeSave)
         n_samples = int(round(duration * sample_rate))
-        current_index = 0
-        while True:
-            if fade_distance == 0:
+
+        current_interval_index = 0
+        while current_interval_index < n_samples:
+            if knob_value > 40:
                 yield current_sound_wrapper.currentSoundBuffer[-1]
-            if len(current_sound_wrapper.previousSoundArray) + len(current_sound_wrapper.currentSoundBuffer) - 1 \
-                    > last_array_index_to_processs + fade_distance:
-
-                wholeArray.append(current_sound_wrapper.currentSoundBuffer[-1])
-
-                yield (wholeArray[-1] + wholeArray[-fade_distance])
-            else:
-                wholeArray.append(current_sound_wrapper.currentSoundBuffer[-1])
-                yield wholeArray[-1]
-            current_index += 1
-
-            if current_index > n_samples:
-                break
+            simpleSine = np.sin(2 * np.pi * current_interval_index * knob_value / sample_rate)
+            yield simpleSine * current_sound_wrapper.currentSoundBuffer[-1]
+            current_interval_index += 1
+        pass
 
     def internal_filter_generator(self, previous_sound_array
                                   , current_buffer_array, frequency
@@ -116,7 +105,7 @@ class Flanger(PluginBase):
         self.knob1BeforeSave = self.knob1.GetValue()
 
     def get_serialization_data(self):
-        return ('Flanger', {'isSound': True,
+        return ('Modulator', {'isSound': True,
                             'knob1Value': self.knob1.GetValue(),
                             'colourRed': self.colourRed,
                             'colourGreen': self.colourGreen,
@@ -125,7 +114,7 @@ class Flanger(PluginBase):
                             'pluginName': self.instrumentNameTextCtrl.GetValue()})
 
     def on_save(self, event):
-        self.instrumentsPanel.add_instrument(Flanger, self.get_serialization_data()[1])
+        self.instrumentsPanel.add_instrument(Modulator, self.get_serialization_data()[1])
 
     def on_angle_changed1(self, event):
 
