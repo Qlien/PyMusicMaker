@@ -8,14 +8,15 @@ from Plugins.Oscillator.OscSound import OscSound
 from bin.plugin import PluginBase, PluginType
 
 
-class Flanger(PluginBase):
-    icon = wx.Bitmap('Plugins\icons\\flanger.png')
-    pluginType = PluginType.FILTER
+
+class DrumB(PluginBase):
+    icon = wx.Bitmap('Plugins\icons\\drum.png')
+    pluginType = PluginType.SOUNDGENERATOR
 
     def __init__(self, frameParent, **kwargs):
-        super(Flanger, self).__init__(frameParent, PluginType.FILTER
+        super(DrumB, self).__init__(frameParent, PluginType.SOUNDGENERATOR
                                       , wx.Bitmap('Plugins\Oscillator\Graphics\icon.png')
-                                      , name=kwargs.get('pluginName', 'Flanger'))
+                                      , name=kwargs.get('pluginName', 'DrumB'))
 
         self.instrumentsPanel = None
 
@@ -41,7 +42,7 @@ class Flanger(PluginBase):
         bottomsizer = wx.BoxSizer(wx.HORIZONTAL)
         leftknobsizer = wx.StaticBoxSizer(leftknobsizer_staticbox, wx.VERTICAL)
         self.base_menu = self.base_top_window_menu_sizer_getter(
-            frameParent, PluginType.FILTER, Flanger.icon, **kwargs)
+            frameParent, PluginType.SOUNDGENERATOR, DrumB.icon, **kwargs)
 
         self.colourRed = kwargs.get('colourRed', random.randint(0, 255))
         self.colourGreen = kwargs.get('colourGreen', random.randint(0, 255))
@@ -75,34 +76,28 @@ class Flanger(PluginBase):
 
         event.Skip()
 
-    def get_filter_generator(self, current_sound_wrapper
-                             , frequency=440, duration=1.0, sample_rate=44100, bits=16
-                             , framesInterval=128, bpm=128):
+    def generate_sound(self, frequency=440, duration=1.0, sample_rate=44000, bits=16, framesInterval=1024, bpm=128):
+        return self.sound_generator(frequency=frequency, duration=duration, sample_rate=sample_rate, bits=bits
+                                    , framesInterval=1024, bpm=128)
 
-        wholeArray = current_sound_wrapper.previousSoundArray[:]
-        knob_value = self.knob1BeforeSave / 100
-        fade_distance = int(sample_rate * knob_value)
-
-        second_list = []
-        last_array_index_to_processs = len(wholeArray) - 1
+    def sound_generator(self, frequency=440, duration=1.0, sample_rate=44100, bits=16, framesInterval=1024, bpm=128):
+        knobVal = int(self.knob1BeforeSave)
         n_samples = int(round(duration * sample_rate))
-        current_index = 0
-        while True:
-            if fade_distance == 0:
-                yield current_sound_wrapper.currentSoundBuffer[-1]
-            if len(current_sound_wrapper.previousSoundArray) + len(current_sound_wrapper.currentSoundBuffer) - 1 \
-                    > last_array_index_to_processs + fade_distance:
 
-                wholeArray.append(current_sound_wrapper.currentSoundBuffer[-1])
+        wavetable_size = int(sample_rate // (frequency / 2))
+        wavetable = (2 * np.random.randint(0, 2, wavetable_size) - 1).astype(np.float32)
 
-                yield (wholeArray[-1] + wholeArray[-fade_distance])
-            else:
-                wholeArray.append(current_sound_wrapper.currentSoundBuffer[-1])
-                yield wholeArray[-1]
-            current_index += 1
-
-            if current_index > n_samples:
-                break
+        samples = []
+        current_sample = 0
+        previous_value = 0
+        while len(samples) < n_samples:
+            random_sign = 1 if random.randint(0, 101) < knobVal else -1
+            wavetable[current_sample] = random_sign * 0.5 * (wavetable[current_sample] + previous_value)
+            samples.append(wavetable[current_sample])
+            previous_value = samples[-1]
+            current_sample += 1
+            current_sample = current_sample % wavetable.size
+            yield wavetable[current_sample]
 
     def internal_filter_generator(self, previous_sound_array
                                   , current_buffer_array, frequency
@@ -121,7 +116,7 @@ class Flanger(PluginBase):
         self.knob1BeforeSave = self.knob1.GetValue()
 
     def get_serialization_data(self):
-        return ('Flanger', {'isSound': True,
+        return ('DrumB', {'isSound': True,
                             'knob1Value': self.knob1.GetValue(),
                             'colourRed': self.colourRed,
                             'colourGreen': self.colourGreen,
@@ -130,7 +125,7 @@ class Flanger(PluginBase):
                             'pluginName': self.instrumentNameTextCtrl.GetValue()})
 
     def on_save(self, event):
-        self.instrumentsPanel.add_instrument(Flanger, self.get_serialization_data()[1])
+        self.instrumentsPanel.add_instrument(DrumB, self.get_serialization_data()[1])
 
     def on_angle_changed1(self, event):
 
