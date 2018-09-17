@@ -3,7 +3,7 @@ Simple daw like music maker made in Python.
 
 PyMusicMaker allows to make melodies by combining sounds made in various plugins, and then save them as real sounds.
 
-![app screen](https://i.imgur.com/AsFFYre.png)
+![app screen](https://i.imgur.com/ZWSon65.png)
 
 Main window consists of three key subwindows:
 
