@@ -17,7 +17,7 @@ Sounds made in PyMusicMaker can be saved and loaded by selecting specified optio
 
 bits per minute (field present by the play and pause buttons) can be modified changing tempo of the sound.
 
-Libraries used in project, and necessary run app:
+Libraries used in project, and necessary to run app:
 -	wxPython
 -	PyAudio
 -	NumPy
