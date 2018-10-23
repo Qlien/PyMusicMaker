@@ -1,5 +1,5 @@
 # PyMusicMaker
-Simple daw like music maker made in Python.
+Simple tracker like music maker made in Python.
 
 PyMusicMaker allows to make melodies by combining sounds made in various plugins, and then save them as real sounds.
 
