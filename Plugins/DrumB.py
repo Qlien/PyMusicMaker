@@ -1,4 +1,5 @@
 import random
+import pyaudio
 
 import numpy as np
 import wx
@@ -35,7 +36,7 @@ class DrumB(PluginBase):
 
         self.knob1BeforeSave = self.knob1.GetValue()
 
-        leftknobsizer_staticbox = wx.StaticBox(self, -1, "Flanger level")
+        leftknobsizer_staticbox = wx.StaticBox(self, -1, "Drum colour B parameter")
 
         panelsizer = wx.BoxSizer(wx.VERTICAL)
         menusizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -72,7 +73,21 @@ class DrumB(PluginBase):
 
     def on_char(self, event):
         if event.GetUnicodeKey() == wx.WXK_SPACE:
-            pass
+            p = pyaudio.PyAudio()
+            # for paFloat32 sample values must be in range [-1.0, 1.0]
+            stream = p.open(format=pyaudio.paFloat32,
+                            channels=1,
+                            rate=44100,
+                            output=True,
+                            frames_per_buffer=44100)
+
+            stream.start_stream()
+            stream.write(np.array([x for x in self.generate_sound()]).astype(np.float32))
+            stream.stop_stream()
+            stream.close()
+
+            # close PyAudio (7)
+            p.terminate()
 
         event.Skip()
 

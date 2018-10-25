@@ -31,7 +31,7 @@ class Modulator(PluginBase):
 
         self.knob1BeforeSave = self.knob1.GetValue()
 
-        leftknobsizer_staticbox = wx.StaticBox(self, -1, "Flanger level")
+        leftknobsizer_staticbox = wx.StaticBox(self, -1, "Modulator frequency")
 
         panelsizer = wx.BoxSizer(wx.VERTICAL)
         menusizer = wx.BoxSizer(wx.HORIZONTAL)

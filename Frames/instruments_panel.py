@@ -1,6 +1,5 @@
 import wx
 
-
 def generate_instruments_panel(parent):
     win = wx.MDIChildFrame(parent, -1, "Instruments", size=(110, 600), pos=(136, 0),
                            style=wx.CLOSE_BOX | wx.CAPTION | wx.CLIP_CHILDREN | wx.RESIZE_BORDER)
@@ -77,7 +76,7 @@ class Instruments(wx.Panel):
 
     def create_menu(self):
         self.menu = wx.Menu()
-        item1 = self.menu.Append(-1, 'Remove')
+        # item1 = self.menu.Append(-1, 'Remove')
         self.update_instruments()
 
     def clear_instruments(self):
