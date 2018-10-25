@@ -2,9 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="abd153ef-5b61-454a-91f7-f65898940699" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Plugins/Modulator.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Plugins/Flanger.py" beforeDir="false" afterPath="$PROJECT_DIR$/Plugins/Flanger.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frames/soundboard_wrapper_panel.py" beforeDir="false" afterPath="$PROJECT_DIR$/Frames/soundboard_wrapper_panel.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/frame.py" beforeDir="false" afterPath="$PROJECT_DIR$/bin/frame.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/toolbarHelper.py" beforeDir="false" afterPath="$PROJECT_DIR$/bin/toolbarHelper.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -13,142 +14,90 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/PyMusicMaker$main.coverage" NAME="main Coverage Results" MODIFIED="1537150402867" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/PyMusicMaker$main.coverage" NAME="main Coverage Results" MODIFIED="1540472080404" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="FUSProjectUsageTrigger">
     <session id="1155181596">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="1" />
+          <entry key="project.closed" value="2" />
           <entry key="project.open.time.0" value="1" />
+          <entry key="project.open.time.1" value="1" />
           <entry key="project.open.time.9" value="2" />
-          <entry key="project.opened" value="3" />
+          <entry key="project.opened" value="4" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="html" value="1" />
-          <entry key="py" value="177" />
+          <entry key="py" value="182" />
           <entry key="pyi" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="HTML" value="1" />
-          <entry key="Python" value="177" />
+          <entry key="Python" value="182" />
           <entry key="PythonStub" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="dummy" value="131" />
-          <entry key="py" value="7726" />
+          <entry key="py" value="7790" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="131" />
-          <entry key="Python" value="7726" />
+          <entry key="Python" value="7790" />
         </counts>
       </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Plugins/KarplusStrong.py">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Frames/soundboard_wrapper_panel.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="153">
-              <caret line="9" selection-start-line="9" selection-end-line="24" selection-end-column="39" />
+            <state relative-caret-position="119">
+              <caret line="65" column="114" selection-start-line="65" selection-start-column="114" selection-end-line="65" selection-end-column="114" />
               <folding>
-                <element signature="e#0#14#0" expanded="true" />
+                <element signature="e#0#16#0" expanded="true" />
+                <marker date="1540472077924" expanded="true" signature="3151:3459" ph="..." />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/bin/soundGeneration.py">
+        <entry file="file://$PROJECT_DIR$/bin/toolbarHelper.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="345">
-              <caret line="108" selection-start-line="108" selection-end-line="108" />
+            <state relative-caret-position="102">
+              <caret line="7" column="8" selection-start-line="7" selection-start-column="8" selection-end-line="7" selection-end-column="8" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/bin/frame.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="226">
+              <caret line="30" column="63" selection-start-line="30" selection-start-column="63" selection-end-line="30" selection-end-column="63" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
-                <marker date="1537036972121" expanded="true" signature="291:464" ph="..." />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Plugins/DrumB.py">
+        <entry file="file://$PROJECT_DIR$/Frames/MoveMe/Canvas/soundBoardSubWindow.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="524">
-              <caret line="44" column="50" selection-start-line="44" selection-start-column="50" selection-end-line="44" selection-end-column="50" />
+            <state relative-caret-position="68">
+              <caret line="25" column="8" selection-start-line="25" selection-start-column="8" selection-end-line="25" selection-end-column="8" />
               <folding>
-                <element signature="e#0#13#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Plugins/Flanger.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="80" selection-start-line="80" selection-end-line="80" />
-              <folding>
-                <element signature="e#0#13#0" expanded="true" />
-                <marker date="1537148458854" expanded="true" signature="4089:4094" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Plugins/Modulator.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="340">
-              <caret line="86" column="75" lean-forward="true" selection-start-line="86" selection-start-column="75" selection-end-line="86" selection-end-column="75" />
-              <folding>
-                <element signature="e#0#13#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/main.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
-              <caret line="13" selection-start-line="13" selection-end-line="13" />
-              <folding>
-                <element signature="e#0#37#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Plugins/Oscillator/OscSound.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="234">
-              <caret line="26" column="52" selection-start-line="26" selection-start-column="52" selection-end-line="26" selection-end-column="52" />
-              <folding>
-                <element signature="e#0#18#0" expanded="true" />
-                <marker date="1537004988703" expanded="true" signature="449:455" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Plugins/SineOscillator.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="157">
-              <caret line="78" selection-start-line="78" selection-end-line="78" />
-              <folding>
-                <marker date="1537099698119" expanded="true" signature="4119:4125" ph="..." />
+                <element signature="e#0#11#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -165,16 +114,11 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>oscill</find>
-      <find>save wav</find>
-      <find>seri</find>
-      <find>filt</find>
       <find>filters</find>
       <find>float32</find>
       <find>save</find>
       <find>filter</find>
       <find>float</find>
-      <find>play</find>
       <find>on_st</find>
       <find>icon</find>
       <find>generate_sound</find>
@@ -195,6 +139,11 @@
       <find>type</find>
       <find>on_cl</find>
       <find>FIL</find>
+      <find>128</find>
+      <find>play</find>
+      <find>bpm</find>
+      <find>NumCtrl</find>
+      <find>numctrl</find>
     </findStrings>
     <dirStrings>
       <dir>C:\Users\Michal\Documents\PyMusicMaker\Plugins</dir>
@@ -224,8 +173,6 @@
         <option value="$PROJECT_DIR$/Frames/soundboard_panel.py" />
         <option value="$PROJECT_DIR$/Plugins/Reverb/ReverbFilter.py" />
         <option value="$PROJECT_DIR$/Frames/MoveMe/Canvas/soundBoardSubWindow.py" />
-        <option value="$PROJECT_DIR$/Frames/soundboard_wrapper_panel.py" />
-        <option value="$PROJECT_DIR$/bin/frame.py" />
         <option value="$PROJECT_DIR$/Frames/instruments_panel.py" />
         <option value="$PROJECT_DIR$/bin/soundGeneration.py" />
         <option value="$PROJECT_DIR$/Plugins/Reverb.py" />
@@ -241,6 +188,9 @@
         <option value="$PROJECT_DIR$/Plugins/DrumB.py" />
         <option value="$PROJECT_DIR$/Plugins/Flanger.py" />
         <option value="$PROJECT_DIR$/Plugins/Modulator.py" />
+        <option value="$PROJECT_DIR$/bin/toolbarHelper.py" />
+        <option value="$PROJECT_DIR$/bin/frame.py" />
+        <option value="$PROJECT_DIR$/Frames/soundboard_wrapper_panel.py" />
       </list>
     </option>
   </component>
@@ -251,8 +201,8 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="210" />
-    <option name="y" value="42" />
+    <option name="x" value="372" />
+    <option name="y" value="49" />
     <option name="width" value="1649" />
     <option name="height" value="1021" />
   </component>
@@ -381,23 +331,23 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="210" y="42" width="1649" height="1021" extended-state="0" />
+    <frame x="372" y="49" width="1649" height="1021" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17243549" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17432347" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" sideWeight="0.49024543" weight="0.3287037" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.44745123" weight="0.3287037" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.4562618" visible="true" weight="0.39699075" />
+      <window_info active="true" anchor="bottom" id="Find" order="1" sideWeight="0.4896161" visible="true" weight="0.3287037" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4468219" weight="0.3287037" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.45563248" weight="0.39699075" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="8" sideWeight="0.49590936" weight="0.32871974" />
       <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.5437382" side_tool="true" visible="true" weight="0.39699075" />
+      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.5103839" side_tool="true" visible="true" weight="0.3287037" />
       <window_info anchor="bottom" id="Terminal" order="11" />
       <window_info anchor="bottom" id="Python Console" order="12" />
       <window_info anchor="bottom" id="Concurrent Activities Diagram" order="13" sideWeight="0.49968535" weight="0.3298611" />
@@ -442,6 +392,11 @@
           <url>file://$PROJECT_DIR$/bin/plugin.py</url>
           <line>95</line>
           <option name="timeStamp" value="116" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/bin/soundGeneration.py</url>
+          <line>35</line>
+          <option name="timeStamp" value="117" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -592,13 +547,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/bin/toolbarHelper.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="27" column="8" selection-start-line="27" selection-start-column="8" selection-end-line="27" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Anaconda3/Lib/wave.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="158">
@@ -644,16 +592,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Frames/MoveMe/Canvas/soundBoardSubWindow.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="164">
-          <caret line="123" column="61" selection-start-line="123" selection-start-column="61" selection-end-line="123" selection-end-column="61" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydev_imps/_pydev_execfile.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="238">
@@ -675,17 +613,6 @@
           <folding>
             <element signature="e#0#9#0" expanded="true" />
             <marker date="1537043048657" expanded="true" signature="236:241" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Frames/soundboard_wrapper_panel.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1173">
-          <caret line="76" selection-start-line="76" selection-end-line="76" />
-          <folding>
-            <element signature="e#0#16#0" expanded="true" />
-            <marker date="1537033044795" expanded="true" signature="3083:3391" ph="..." />
           </folding>
         </state>
       </provider>
@@ -763,42 +690,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/bin/frame.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="157">
-          <caret line="73" selection-start-line="73" selection-end-line="73" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Frames/plugins_panel.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="289">
           <caret line="35" column="66" selection-start-line="35" selection-start-column="66" selection-end-line="35" selection-end-column="66" />
           <folding>
             <element signature="e#0#16#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Plugins/KarplusStrong.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" selection-start-line="9" selection-end-line="24" selection-end-column="39" />
-          <folding>
-            <element signature="e#0#14#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Plugins/DrumB.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="524">
-          <caret line="44" column="50" selection-start-line="44" selection-start-column="50" selection-end-line="44" selection-end-column="50" />
-          <folding>
-            <element signature="e#0#13#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -813,17 +710,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/bin/soundGeneration.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="108" selection-start-line="108" selection-end-line="108" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-            <marker date="1537036972121" expanded="true" signature="291:464" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/wx/lib/agw/knobctrl.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="165">
@@ -831,19 +717,19 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Plugins/SineOscillator.py">
+    <entry file="file://$PROJECT_DIR$/Plugins/DrumB.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="157">
-          <caret line="78" selection-start-line="78" selection-end-line="78" />
+        <state relative-caret-position="629">
+          <caret line="44" column="50" selection-start-line="44" selection-start-column="50" selection-end-line="44" selection-end-column="50" />
           <folding>
-            <marker date="1537099698119" expanded="true" signature="4119:4125" ph="..." />
+            <element signature="e#0#13#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Plugins/Flanger.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
+        <state relative-caret-position="1241">
           <caret line="80" selection-start-line="80" selection-end-line="80" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
@@ -852,9 +738,19 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Plugins/Modulator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1326">
+          <caret line="86" column="75" selection-start-line="86" selection-start-column="75" selection-end-line="86" selection-end-column="75" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Plugins/Oscillator/OscSound.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="234">
+        <state relative-caret-position="408">
           <caret line="26" column="52" selection-start-line="26" selection-start-column="52" selection-end-line="26" selection-end-column="52" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
@@ -863,22 +759,81 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Plugins/SineOscillator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1224">
+          <caret line="78" selection-start-line="78" selection-end-line="78" />
+          <folding>
+            <marker date="1537099698119" expanded="true" signature="4119:4125" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="13" selection-start-line="13" selection-end-line="13" />
+        <state relative-caret-position="323">
+          <caret line="19" lean-forward="true" selection-start-line="19" selection-end-line="19" />
           <folding>
             <element signature="e#0#37#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Plugins/Modulator.py">
+    <entry file="file://$PROJECT_DIR$/Plugins/KarplusStrong.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="86" column="75" lean-forward="true" selection-start-line="86" selection-start-column="75" selection-end-line="86" selection-end-column="75" />
+        <state relative-caret-position="255">
+          <caret line="15" column="16" lean-forward="true" selection-start-line="15" selection-start-column="14" selection-end-line="15" selection-end-column="16" />
           <folding>
-            <element signature="e#0#13#0" expanded="true" />
+            <element signature="e#0#14#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Frames/MoveMe/Canvas/soundBoardSubWindow.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="25" column="8" selection-start-line="25" selection-start-column="8" selection-end-line="25" selection-end-column="8" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bin/soundGeneration.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="296">
+          <caret line="37" column="80" lean-forward="true" selection-start-line="37" selection-start-column="80" selection-end-line="37" selection-end-column="80" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+            <marker date="1537036972121" expanded="true" signature="291:464" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bin/toolbarHelper.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="7" column="8" selection-start-line="7" selection-start-column="8" selection-end-line="7" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bin/frame.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="226">
+          <caret line="30" column="63" selection-start-line="30" selection-start-column="63" selection-end-line="30" selection-end-column="63" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Frames/soundboard_wrapper_panel.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="65" column="114" selection-start-line="65" selection-start-column="114" selection-end-line="65" selection-end-column="114" />
+          <folding>
+            <element signature="e#0#16#0" expanded="true" />
+            <marker date="1540472077924" expanded="true" signature="3151:3459" ph="..." />
           </folding>
         </state>
       </provider>

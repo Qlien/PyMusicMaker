@@ -29,6 +29,7 @@ def generate_soundboard_wrapper(parent):
 class SoundBoardWrapper(wx.Panel):
     def __init__(self, parent):
         self.frameParent = None
+        self.bpm_numCtrl = None
         self.associationData = {}
         wx.Panel.__init__(self, parent)
         self.parent = parent
@@ -62,17 +63,17 @@ class SoundBoardWrapper(wx.Panel):
 
     def on_play(self, event):
         self.on_stop(None)
-        self.songPlayThread = threading.Thread(target=self.generate_sound, args=(True, ))
+        self.songPlayThread = threading.Thread(target=self.generate_sound, args=(True, self.bpm_numCtrl.GetValue()))
         self.songPlayThread.start()
 
     def on_stop(self, event):
         if self.soundGenerator.soundPlaying:
             self.soundGenerator.soundPlaying = False
 
-    def generate_sound(self, play_audio=False):
+    def generate_sound(self, play_audio=False, bpm=128):
         self.soundGenerator.update_sounds(self.soundboard_panel.generate_sound_representation())
         self.soundGenerator.update_filters(self.filters_panel.generate_sound_representation())
-        self.soundGenerator.set_BPM(128)
+        self.soundGenerator.set_BPM(bpm)
 
         return self.soundGenerator.play_song(play_audio=play_audio)
 

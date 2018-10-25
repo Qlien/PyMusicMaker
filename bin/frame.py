@@ -28,6 +28,7 @@ class MainWindowFrame(wx.MDIParentFrame, WindowBase, SerializationBase):
         self.generate_layout()
         self.generate_windows()
         self.bind_events()
+        self.sound_board_panel.bpm_numCtrl = self.play_menu.bpm
 
     def generate_layout(self):
         """generates main menu aith buttons"""
@@ -157,6 +158,7 @@ class MainWindowFrame(wx.MDIParentFrame, WindowBase, SerializationBase):
                     self.destroy_windows()
                     self.generate_windows()
                     self.bind_events()
+                    self.sound_board_panel.bpm_numCtrl = self.play_menu.bpm
                     self.set_serialization_data(json.load(file))
                     self.instrumentsPanel.update_instruments()
             except IOError:
