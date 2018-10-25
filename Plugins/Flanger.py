@@ -22,9 +22,9 @@ class Flanger(PluginBase):
         self.knob1 = KC.KnobCtrl(self, -1, size=(100, 100))
         self.isSound = kwargs.get('isSound', False)
 
-        self.knob1.SetTags(range(0, 101, 5))
+        self.knob1.SetTags(range(1, 101, 5))
         self.knob1.SetAngularRange(-45, 225)
-        self.knob1.SetValue(kwargs.get('knob1Value', 0))
+        self.knob1.SetValue(kwargs.get('knob1Value', 1))
 
         self.knobtracker1 = wx.StaticText(self, -1, "Value = " + str(self.knob1.GetValue()))
 

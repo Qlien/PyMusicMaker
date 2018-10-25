@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="abd153ef-5b61-454a-91f7-f65898940699" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Frames/instruments_panel.py" beforeDir="false" afterPath="$PROJECT_DIR$/Frames/instruments_panel.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Plugins/DrumB.py" beforeDir="false" afterPath="$PROJECT_DIR$/Plugins/DrumB.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Plugins/Flanger.py" beforeDir="false" afterPath="$PROJECT_DIR$/Plugins/Flanger.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Plugins/Modulator.py" beforeDir="false" afterPath="$PROJECT_DIR$/Plugins/Modulator.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -15,7 +11,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/PyMusicMaker$main.coverage" NAME="main Coverage Results" MODIFIED="1540475088950" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/PyMusicMaker$main.coverage" NAME="main Coverage Results" MODIFIED="1540475315190" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="FUSProjectUsageTrigger">
     <session id="1155181596">
@@ -31,27 +27,27 @@
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="html" value="1" />
-          <entry key="py" value="194" />
+          <entry key="py" value="195" />
           <entry key="pyi" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="HTML" value="1" />
-          <entry key="Python" value="194" />
+          <entry key="Python" value="195" />
           <entry key="PythonStub" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="dummy" value="131" />
-          <entry key="py" value="8037" />
+          <entry key="py" value="8039" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="131" />
-          <entry key="Python" value="8037" />
+          <entry key="Python" value="8039" />
         </counts>
       </usages-collector>
     </session>
@@ -79,13 +75,26 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Plugins/DrumB.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="77" column="38" lean-forward="true" selection-start-line="77" selection-start-column="38" selection-end-line="77" selection-end-column="38" />
+            <state relative-caret-position="34">
+              <caret line="68" column="44" selection-start-line="68" selection-start-column="44" selection-end-line="68" selection-end-column="44" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Plugins/Flanger.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="221">
+              <caret line="26" column="54" selection-start-line="26" selection-start-column="54" selection-end-line="26" selection-end-column="54" />
+              <folding>
+                <element signature="e#0#13#0" expanded="true" />
+                <marker date="1540475313264" expanded="true" signature="4128:4133" ph="..." />
               </folding>
             </state>
           </provider>
@@ -231,8 +240,8 @@
         <option value="$PROJECT_DIR$/bin/frame.py" />
         <option value="$PROJECT_DIR$/Frames/instruments_panel.py" />
         <option value="$PROJECT_DIR$/Plugins/Modulator.py" />
-        <option value="$PROJECT_DIR$/Plugins/Flanger.py" />
         <option value="$PROJECT_DIR$/Plugins/DrumB.py" />
+        <option value="$PROJECT_DIR$/Plugins/Flanger.py" />
       </list>
     </option>
   </component>
@@ -370,12 +379,12 @@
     <frame x="216" y="22" width="1649" height="1021" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17432347" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17432347" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" sideWeight="0.4896161" weight="0.3287037" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.44619256" visible="true" weight="0.3287037" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.44619256" visible="true" weight="0.3287037" />
       <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.45563248" weight="0.39699075" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -838,17 +847,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Plugins/Flanger.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-46">
-          <caret line="32" column="112" lean-forward="true" selection-start-line="26" selection-start-column="56" selection-end-line="32" selection-end-column="112" />
-          <folding>
-            <element signature="e#0#13#0" expanded="true" />
-            <marker date="1540474771436" expanded="true" signature="4128:4133" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Anaconda3/Lib/site-packages/pyaudio.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="157">
@@ -868,10 +866,21 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Plugins/DrumB.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="77" column="38" lean-forward="true" selection-start-line="77" selection-start-column="38" selection-end-line="77" selection-end-column="38" />
+        <state relative-caret-position="34">
+          <caret line="68" column="44" selection-start-line="68" selection-start-column="44" selection-end-line="68" selection-end-column="44" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Plugins/Flanger.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="26" column="54" selection-start-line="26" selection-start-column="54" selection-end-line="26" selection-end-column="54" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+            <marker date="1540475313264" expanded="true" signature="4128:4133" ph="..." />
           </folding>
         </state>
       </provider>
