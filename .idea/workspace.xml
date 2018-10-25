@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="abd153ef-5b61-454a-91f7-f65898940699" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Frames/soundboard_wrapper_panel.py" beforeDir="false" afterPath="$PROJECT_DIR$/Frames/soundboard_wrapper_panel.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/frame.py" beforeDir="false" afterPath="$PROJECT_DIR$/bin/frame.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/toolbarHelper.py" beforeDir="false" afterPath="$PROJECT_DIR$/bin/toolbarHelper.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -14,7 +11,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/PyMusicMaker$main.coverage" NAME="main Coverage Results" MODIFIED="1540472080404" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/PyMusicMaker$main.coverage" NAME="main Coverage Results" MODIFIED="1540473324063" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="FUSProjectUsageTrigger">
     <session id="1155181596">
@@ -30,37 +27,37 @@
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="html" value="1" />
-          <entry key="py" value="182" />
+          <entry key="py" value="184" />
           <entry key="pyi" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="HTML" value="1" />
-          <entry key="Python" value="182" />
+          <entry key="Python" value="184" />
           <entry key="PythonStub" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="dummy" value="131" />
-          <entry key="py" value="7790" />
+          <entry key="py" value="7931" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="131" />
-          <entry key="Python" value="7790" />
+          <entry key="Python" value="7931" />
         </counts>
       </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Frames/soundboard_wrapper_panel.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
+            <state relative-caret-position="22">
               <caret line="65" column="114" selection-start-line="65" selection-start-column="114" selection-end-line="65" selection-end-column="114" />
               <folding>
                 <element signature="e#0#16#0" expanded="true" />
@@ -73,20 +70,38 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/bin/toolbarHelper.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="102">
+            <state relative-caret-position="-80">
               <caret line="7" column="8" selection-start-line="7" selection-start-column="8" selection-end-line="7" selection-end-column="8" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/bin/frame.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="226">
-              <caret line="30" column="63" selection-start-line="30" selection-start-column="63" selection-end-line="30" selection-end-column="63" />
+            <state relative-caret-position="194">
+              <caret line="135" lean-forward="true" selection-start-line="135" selection-end-line="135" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/.PyCharm2018.2/system/python_stubs/-302565141/wx/_core/__init__.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="185">
+              <caret line="4161" column="4" selection-start-line="4161" selection-start-column="4" selection-end-line="4161" selection-end-column="4" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/.PyCharm2018.2/system/python_stubs/-302565141/wx/_core/Frame.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="185">
+              <caret line="256" column="8" selection-start-line="256" selection-start-column="8" selection-end-line="256" selection-end-column="8" />
             </state>
           </provider>
         </entry>
@@ -189,8 +204,8 @@
         <option value="$PROJECT_DIR$/Plugins/Flanger.py" />
         <option value="$PROJECT_DIR$/Plugins/Modulator.py" />
         <option value="$PROJECT_DIR$/bin/toolbarHelper.py" />
-        <option value="$PROJECT_DIR$/bin/frame.py" />
         <option value="$PROJECT_DIR$/Frames/soundboard_wrapper_panel.py" />
+        <option value="$PROJECT_DIR$/bin/frame.py" />
       </list>
     </option>
   </component>
@@ -201,8 +216,8 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="372" />
-    <option name="y" value="49" />
+    <option name="x" value="769" />
+    <option name="y" value="116" />
     <option name="width" value="1649" />
     <option name="height" value="1021" />
   </component>
@@ -331,15 +346,15 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="372" y="49" width="1649" height="1021" extended-state="0" />
+    <frame x="769" y="116" width="1649" height="1021" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17432347" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info active="true" anchor="bottom" id="Find" order="1" sideWeight="0.4896161" visible="true" weight="0.3287037" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4468219" weight="0.3287037" />
+      <window_info anchor="bottom" id="Find" order="1" sideWeight="0.4896161" weight="0.3287037" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.44619256" visible="true" weight="0.3287037" />
       <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.45563248" weight="0.39699075" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -347,7 +362,7 @@
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="8" sideWeight="0.49590936" weight="0.32871974" />
       <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.5103839" side_tool="true" visible="true" weight="0.3287037" />
+      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.55380744" side_tool="true" visible="true" weight="0.3287037" />
       <window_info anchor="bottom" id="Terminal" order="11" />
       <window_info anchor="bottom" id="Python Console" order="12" />
       <window_info anchor="bottom" id="Concurrent Activities Diagram" order="13" sideWeight="0.49968535" weight="0.3298611" />
@@ -428,14 +443,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="1067" selection-start-line="1067" selection-end-line="1067" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Frames/filters_panel.py" />
     <entry file="file://$USER_HOME$/.PyCharm2018.2/system/python_stubs/-302565141/wx/_grid/GridEvent.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="765">
@@ -810,30 +817,44 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Frames/soundboard_wrapper_panel.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="22">
+          <caret line="65" column="114" selection-start-line="65" selection-start-column="114" selection-end-line="65" selection-end-column="114" />
+          <folding>
+            <element signature="e#0#16#0" expanded="true" />
+            <marker date="1540472077924" expanded="true" signature="3151:3459" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/bin/toolbarHelper.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
+        <state relative-caret-position="-80">
           <caret line="7" column="8" selection-start-line="7" selection-start-column="8" selection-end-line="7" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.PyCharm2018.2/system/python_stubs/-302565141/wx/_core/Frame.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="185">
+          <caret line="256" column="8" selection-start-line="256" selection-start-column="8" selection-end-line="256" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.PyCharm2018.2/system/python_stubs/-302565141/wx/_core/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="185">
+          <caret line="4161" column="4" selection-start-line="4161" selection-start-column="4" selection-end-line="4161" selection-end-column="4" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/bin/frame.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="226">
-          <caret line="30" column="63" selection-start-line="30" selection-start-column="63" selection-end-line="30" selection-end-column="63" />
+        <state relative-caret-position="194">
+          <caret line="135" lean-forward="true" selection-start-line="135" selection-end-line="135" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Frames/soundboard_wrapper_panel.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="65" column="114" selection-start-line="65" selection-start-column="114" selection-end-line="65" selection-end-column="114" />
-          <folding>
-            <element signature="e#0#16#0" expanded="true" />
-            <marker date="1540472077924" expanded="true" signature="3151:3459" ph="..." />
           </folding>
         </state>
       </provider>

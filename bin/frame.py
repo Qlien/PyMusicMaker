@@ -34,6 +34,7 @@ class MainWindowFrame(wx.MDIParentFrame, WindowBase, SerializationBase):
         """generates main menu aith buttons"""
 
         menu = wx.Menu()
+        menu.Append(5005, "New")
         menu.Append(5001, "Exit")
         menu.Append(5002, "Save")
         menu.Append(5003, "Load")
@@ -42,6 +43,7 @@ class MainWindowFrame(wx.MDIParentFrame, WindowBase, SerializationBase):
         menuBar.Append(menu, "&File")
         self.SetMenuBar(menuBar)
 
+        self.Bind(wx.EVT_MENU, self.on_new, id=5005)
         self.Bind(wx.EVT_MENU, self.on_exit, id=5001)
         self.Bind(wx.EVT_MENU, self.on_save, id=5002)
         self.Bind(wx.EVT_MENU, self.on_load, id=5003)
@@ -119,10 +121,32 @@ class MainWindowFrame(wx.MDIParentFrame, WindowBase, SerializationBase):
         self.pluginsPanel = None
         self.sound_board_tuple = None
 
-    def on_exit(self):
+    def on_exit(self, evt):
         self.unbind_events()
         self.destroy()
         super(MainWindowFrame, self).on_exit()
+
+    def on_new(self, evt):
+        """loads saved serialized data back to program"""
+
+        dlg = wx.MessageDialog(None, "Unsaved data will be lost",
+                           style=wx.OK | wx.CENTRE | wx.CANCEL | wx.ICON_WARNING)
+        dlg.SetOKCancelLabels("OK", "Cancel")
+        result = dlg.ShowModal()
+
+        if result == wx.ID_CANCEL:
+            return  # the user changed their mind
+
+        # Proceed loading the file chosen by the user
+        try:
+            self.unbind_events()
+            self.destroy_windows()
+            self.generate_windows()
+            self.bind_events()
+            self.sound_board_panel.bpm_numCtrl = self.play_menu.bpm
+            self.instrumentsPanel.update_instruments()
+        except IOError:
+            wx.LogError("Something went wrong")
 
     def on_save(self, evt):
         """responsible for opening saving window, selecting name and saving serialized data"""
